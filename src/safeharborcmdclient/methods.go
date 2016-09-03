@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"reflect"
 	
-	"safeharborcmdclient/rest"
+	"utilities/rest"
 )
 
 /*******************************************************************************

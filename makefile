@@ -10,7 +10,8 @@ EXECNAME=$(PACKAGENAME)
 
 SHELL = /bin/sh
 
-CURDIR=$(shell pwd)
+CURDIR:=$(shell pwd)
+UTILITIESDIR:=$(realpath $(CURDIR)/../Utilities)
 
 .PHONY: all compile clean info
 .DEFAULT: all
@@ -30,4 +31,5 @@ $(build_dir)/$(EXECNAME): $(build_dir) $(src_dir)
 compile: $(build_dir)/$(PACKAGENAME)
 
 $(build_dir)/$(PACKAGENAME): $(build_dir)
-	@GOPATH=$(CURDIR) go install $(PACKAGENAME)
+	echo "UTILITIESDIR=$(UTILITIESDIR)"
+	@GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME)

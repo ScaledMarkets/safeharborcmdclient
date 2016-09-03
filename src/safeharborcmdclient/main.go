@@ -23,9 +23,6 @@ import (
 	"strconv"
 	"encoding/json"
 	
-	"redis"
-	"goredis"
-	
 	// SafeHarbor packages:
 	"utilities/rest"
 )
