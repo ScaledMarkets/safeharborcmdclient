@@ -31,5 +31,5 @@ $(build_dir)/$(EXECNAME): $(build_dir) $(src_dir)
 compile: $(build_dir)/$(PACKAGENAME)
 
 $(build_dir)/$(PACKAGENAME): $(build_dir)
-	echo "UTILITIESDIR=$(UTILITIESDIR)"
+	@echo "UTILITIESDIR=$(UTILITIESDIR)"
 	@GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME)

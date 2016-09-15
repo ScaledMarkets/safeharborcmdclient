@@ -111,7 +111,3 @@ func main() {
 		}
 	}
 }
-
-type CmdContext struct {
-	RestContext
-}
