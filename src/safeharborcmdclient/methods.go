@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"os"
 	"io"
-	"io/ioutil"
-	"reflect"
+	//"io/ioutil"
+	//"reflect"
+	"errors"
 	
 	"utilities/rest"
 )
@@ -16,15 +17,16 @@ import (
  */
 func (cmdContext *CmdContext) CallGetGroupDesc(groupId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetGroupDesc")
+	cmdContext.StartCall("CallGetGroupDesc")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getGroupDesc",
 		[]string{"Log", "GroupId"},
-		[]string{cmdContext.TestDemarcation(), groupId})
+		[]string{cmdContext.CallDemarcation(), groupId})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
@@ -39,15 +41,16 @@ func (cmdContext *CmdContext) CallGetGroupDesc(groupId string) (map[string]inter
  */
 func (cmdContext *CmdContext) CallGetRepoDesc(repoId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetRepoDesc")
+	cmdContext.StartCall("CallGetRepoDesc")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getRepoDesc",
 		[]string{"Log", "RepoId"},
-		[]string{cmdContext.TestDemarcation(), repoId})
+		[]string{cmdContext.CallDemarcation(), repoId})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
@@ -64,15 +67,16 @@ func (cmdContext *CmdContext) CallGetRepoDesc(repoId string) (map[string]interfa
  */
 func (cmdContext *CmdContext) CallGetDockerImageDesc(dockerImageId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartTest("getDockerImageDesc")
+	cmdContext.StartCall("getDockerImageDesc")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerImageDesc",
 		[]string{"Log", "DockerImageId"},
-		[]string{cmdContext.TestDemarcation(), dockerImageId})
+		[]string{cmdContext.CallDemarcation(), dockerImageId})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) {
 		return nil, errors.New(resp.Status)
@@ -91,18 +95,16 @@ func (cmdContext *CmdContext) CallGetDockerImageDesc(dockerImageId string) (map[
  */
 func (cmdContext *CmdContext) CallRemDockerfile(dockerfileId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallRemDockerfile")
+	cmdContext.StartCall("CallRemDockerfile")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remDockerfile",
 		[]string{"Log", "DockerfileId"},
-		[]string{cmdContext.TestDemarcation(), dockerfileId})
+		[]string{cmdContext.CallDemarcation(), dockerfileId})
 	
 	defer resp.Body.Close()
-	if err != nil {
-		return nil, errors.New(resp.Status)
-	}
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
@@ -117,15 +119,16 @@ func (cmdContext *CmdContext) CallRemDockerfile(dockerfileId string) (map[string
  */
 func (cmdContext *CmdContext) CallGetDockerfileDesc(dockerfileId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartTest("getDockerfileDesc")
+	cmdContext.StartCall("getDockerfileDesc")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerfileDesc",
 		[]string{"Log", "DockerfileId"},
-		[]string{cmdContext.TestDemarcation(), dockerfileId})
+		[]string{cmdContext.CallDemarcation(), dockerfileId})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
@@ -142,22 +145,22 @@ func (cmdContext *CmdContext) CallGetDockerfileDesc(dockerfileId string) (map[st
 func (cmdContext *CmdContext) CallCreateRealm(realmName, orgFullName,
 	desc string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallCreateRealm")
+	cmdContext.StartCall("CallCreateRealm")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"createRealm",
 		[]string{"Log", "RealmName", "OrgFullName", "Description"},
-		[]string{cmdContext.TestDemarcation(), realmName, orgFullName, desc})
+		[]string{cmdContext.CallDemarcation(), realmName, orgFullName, desc})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
-	// Get the realm Id that is returned in the response body.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "" }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -166,19 +169,19 @@ func (cmdContext *CmdContext) CallCreateRealm(realmName, orgFullName,
  */
 func (cmdContext *CmdContext) TestGetRealmByName(realmName string) (map[string]interface{}, error) {
 	
-	cmdContext.StartTest("TestGetRealmByName")
+	cmdContext.StartCall("TestGetRealmByName")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getRealmByName",
 		[]string{"Log", "RealmName"},
-		[]string{cmdContext.TestDemarcation(), realmName})
+		[]string{cmdContext.CallDemarcation(), realmName})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
-	// Get the realm Id that is returned in the response body.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
 	if err != nil { fmt.Println(err.Error()); return nil, err }
@@ -200,22 +203,23 @@ func (cmdContext *CmdContext) TestGetRealmByName(realmName string) (map[string]i
 func (cmdContext *CmdContext) CallCreateUser(userId string, userName string,
 	email string, pswd string, realmId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallCreateUser")
+	cmdContext.StartCall("CallCreateUser")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"createUser",
 		[]string{"Log", "UserId", "UserName", "EmailAddress", "Password", "RealmId"},
-		[]string{cmdContext.TestDemarcation(), userId, userName, email, pswd, realmId})
+		[]string{cmdContext.CallDemarcation(), userId, userName, email, pswd, realmId})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "", nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -224,20 +228,20 @@ func (cmdContext *CmdContext) CallCreateUser(userId string, userName string,
  */
 func (cmdContext *CmdContext) CallAuthenticate(userId string, pswd string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallAuthenticate")
+	cmdContext.StartCall("CallAuthenticate")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"authenticate",
 		[]string{"Log", "UserId", "Password"},
-		[]string{cmdContext.TestDemarcation(), userId, pswd})
+		[]string{cmdContext.CallDemarcation(), userId, pswd})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
-	// Get the repo Id that is returned in the response body.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
 	if err != nil { fmt.Println(err.Error()); return nil, err }
@@ -249,16 +253,17 @@ func (cmdContext *CmdContext) CallAuthenticate(userId string, pswd string) (map[
  */
 func (cmdContext *CmdContext) CallDisableUser(userObjId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallDisableUser")
+	cmdContext.StartCall("CallDisableUser")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"disableUser",
 		[]string{"Log", "UserObjId"},
-		[]string{cmdContext.TestDemarcation(), userObjId})
+		[]string{cmdContext.CallDemarcation(), userObjId})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -273,21 +278,23 @@ func (cmdContext *CmdContext) CallDisableUser(userObjId string) (map[string]inte
  */
 func (cmdContext *CmdContext) CallDeleteGroup(groupId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallDeleteGroup")
+	cmdContext.StartCall("CallDeleteGroup")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"deleteGroup",
 		[]string{"Log", "GroupId"},
-		[]string{cmdContext.TestDemarcation(), groupId})
+		[]string{cmdContext.CallDemarcation(), groupId})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -296,16 +303,17 @@ func (cmdContext *CmdContext) CallDeleteGroup(groupId string) (map[string]interf
  */
 func (cmdContext *CmdContext) CallLogout() (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallLogout")
+	cmdContext.StartCall("CallLogout")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"logout",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -321,7 +329,7 @@ func (cmdContext *CmdContext) CallLogout() (map[string]interface{}, error) {
 func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
 	desc string, optDockerfilePath string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallCreateRepo")
+	cmdContext.StartCall("CallCreateRepo")
 	
 	var resp *http.Response
 	var err error
@@ -331,14 +339,14 @@ func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
 		resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 			"createRepo",
 			[]string{"Log", "RealmId", "Name", "Description"},
-			[]string{cmdContext.TestDemarcation(), realmId, name, desc})
+			[]string{cmdContext.CallDemarcation(), realmId, name, desc})
 		fmt.Println("HTTP POST completed")
 	} else {
 		fmt.Println("Using SendSessionFilePost")
 		resp, err = cmdContext.SendSessionFilePost(cmdContext.SessionId,
 			"createRepo",
 			[]string{"Log", "RealmId", "Name", "Description"},
-			[]string{cmdContext.TestDemarcation(), realmId, name, desc},
+			[]string{cmdContext.CallDemarcation(), realmId, name, desc},
 			optDockerfilePath)
 		fmt.Println("HTTP file post completed")
 	}
@@ -361,14 +369,14 @@ func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
 func (cmdContext *CmdContext) CallAddDockerfile(repoId string, dockerfilePath string,
 	desc string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallAddDockerfile")
+	cmdContext.StartCall("CallAddDockerfile")
 	fmt.Println("\t", dockerfilePath)
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionFilePost(cmdContext.SessionId,
 		"addDockerfile",
 		[]string{"Log", "RepoId", "Description"},
-		[]string{cmdContext.TestDemarcation(), repoId, desc},
+		[]string{cmdContext.CallDemarcation(), repoId, desc},
 		dockerfilePath)
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
@@ -388,16 +396,17 @@ func (cmdContext *CmdContext) CallAddDockerfile(repoId string, dockerfilePath st
  */
 func (cmdContext *CmdContext) CallGetDockerfiles(repoId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetDockerfiles")
+	cmdContext.StartCall("CallGetDockerfiles")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerfiles",
 		[]string{"Log", "RepoId"},
-		[]string{cmdContext.TestDemarcation(), repoId})
+		[]string{cmdContext.CallDemarcation(), repoId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -413,27 +422,25 @@ func (cmdContext *CmdContext) CallGetDockerfiles(repoId string) ([]map[string]in
 func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId string,
 	imageName string, paramNames, paramValues []string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallExecDockerfile")
+	cmdContext.StartCall("CallExecDockerfile")
 	
 	if len(paramNames) != len(paramValues) { panic(
-		"Invalid test: len param names != len param values") }
+		"Invalid: len param names != len param values") }
 	var paramStr string = ""
 	for i, paramName := range paramNames {
 		if i > 0 { paramStr = paramStr + ";" }
 		paramStr = paramStr + fmt.Sprintf("%s:%s", paramName, paramValues[i])
 	}
 	
-	fmt.Println("paramStr=" + paramStr)
-	fmt.Println(fmt.Sprintf("len(paramNames)=%d, len(paramValues)=%d", len(paramNames), len(paramValues)))
-	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"execDockerfile",
 		[]string{"Log", "RepoId", "DockerfileId", "ImageName", "Params"},
-		[]string{cmdContext.TestDemarcation(), repoId, dockerfileId, imageName, paramStr})
+		[]string{cmdContext.CallDemarcation(), repoId, dockerfileId, imageName, paramStr})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -462,7 +469,7 @@ func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId str
 func (cmdContext *CmdContext) CallAddAndExecDockerfile(repoId string, desc string,
 	imageName string, dockerfilePath string, paramNames, paramValues []string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallAddAndExecDockerfile")
+	cmdContext.StartCall("CallAddAndExecDockerfile")
 	
 	if len(paramNames) != len(paramValues) { panic(
 		"Invalid test: len param names != len param values") }
@@ -478,11 +485,12 @@ func (cmdContext *CmdContext) CallAddAndExecDockerfile(repoId string, desc strin
 	resp, err = cmdContext.SendSessionFilePost("",
 		"addAndExecDockerfile",
 		[]string{"Log", "RepoId", "Description", "ImageName", "SessionId", "Params"},
-		[]string{cmdContext.TestDemarcation(), repoId, desc, imageName,
+		[]string{cmdContext.CallDemarcation(), repoId, desc, imageName,
 			cmdContext.SessionId, paramStr},
 		dockerfilePath)
 
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -498,18 +506,16 @@ func (cmdContext *CmdContext) CallAddAndExecDockerfile(repoId string, desc strin
  */
 func (cmdContext *CmdContext) CallGetEventDesc(eventId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetEventDesc")
+	cmdContext.StartCall("CallGetEventDesc")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getEventDesc",
 		[]string{"Log", "EventId"},
-		[]string{cmdContext.TestDemarcation(), eventId})
+		[]string{cmdContext.CallDemarcation(), eventId})
 	defer resp.Body.Close()
-	if err != nil {
-		return nil, errors.New(resp.Status)
-	}
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -524,19 +530,17 @@ func (cmdContext *CmdContext) CallGetEventDesc(eventId string) (map[string]inter
  */
 func (cmdContext *CmdContext) CallGetDockerImages(repoId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetDockerImages")
+	cmdContext.StartCall("CallGetDockerImages")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerImages",
 		[]string{"Log", "RepoId"},
-		[]string{cmdContext.TestDemarcation(), repoId})
+		[]string{cmdContext.CallDemarcation(), repoId})
 	
 	defer resp.Body.Close()
-	if err != nil {
-		return nil, errors.New(resp.Status)
-	}
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -551,16 +555,17 @@ func (cmdContext *CmdContext) CallGetDockerImages(repoId string) ([]map[string]i
  */
 func (cmdContext *CmdContext) CallGetUserDesc(userId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetUserDesc")
+	cmdContext.StartCall("CallGetUserDesc")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getUserDesc",
 		[]string{"Log", "UserId"},
-		[]string{cmdContext.TestDemarcation(), userId})
+		[]string{cmdContext.CallDemarcation(), userId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -576,7 +581,7 @@ func (cmdContext *CmdContext) CallGetUserDesc(userId string) (map[string]interfa
 func (cmdContext *CmdContext) CallCreateGroup(realmId, name, description string,
 	addMe bool) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallCreateGroup")
+	cmdContext.StartCall("CallCreateGroup")
 	
 	var addMeStr = "false"
 	if addMe { addMeStr = "true" }
@@ -586,9 +591,10 @@ func (cmdContext *CmdContext) CallCreateGroup(realmId, name, description string,
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"createGroup",
 		[]string{"Log", "RealmId", "Name", "Description", "AddMe"},
-		[]string{cmdContext.TestDemarcation(), realmId, name, description, addMeStr})
+		[]string{cmdContext.CallDemarcation(), realmId, name, description, addMeStr})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -604,18 +610,19 @@ func (cmdContext *CmdContext) CallCreateGroup(realmId, name, description string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetGroupUsers(groupId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) CallGetGroupUsers(groupId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetGroupUsers")
+	cmdContext.StartCall("CallGetGroupUsers")
 
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getGroupUsers",
 		[]string{"Log", "GroupId"},
-		[]string{cmdContext.TestDemarcation(), groupId})
+		[]string{cmdContext.CallDemarcation(), groupId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -631,16 +638,17 @@ func (cmdContext *CmdContext) CallGetGroupUsers(groupId string) (map[string]inte
  */
 func (cmdContext *CmdContext) CallAddGroupUser(groupId, userId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallAddGroupUser")
+	cmdContext.StartCall("CallAddGroupUser")
 
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"addGroupUser",
 		[]string{"Log", "GroupId", "UserObjId"},
-		[]string{cmdContext.TestDemarcation(), groupId, userId})
+		[]string{cmdContext.CallDemarcation(), groupId, userId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -657,16 +665,17 @@ func (cmdContext *CmdContext) CallAddGroupUser(groupId, userId string) (map[stri
  */
 func (cmdContext *CmdContext) CallMoveUserToRealm(userObjId, realmId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallMoveUserToRealm")
+	cmdContext.StartCall("CallMoveUserToRealm")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"moveUserToRealm",
 		[]string{"Log", "UserObjId", "RealmId"},
-		[]string{cmdContext.TestDemarcation(), userObjId, realmId})
+		[]string{cmdContext.CallDemarcation(), userObjId, realmId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -681,16 +690,17 @@ func (cmdContext *CmdContext) CallMoveUserToRealm(userObjId, realmId string) (ma
  */
 func (cmdContext *CmdContext) CallGetRealmGroups(realmId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetRealmGroups")
+	cmdContext.StartCall("CallGetRealmGroups")
 
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getRealmGroups",
 		[]string{"Log", "RealmId"},
-		[]string{cmdContext.TestDemarcation(), realmId})
+		[]string{cmdContext.CallDemarcation(), realmId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -709,18 +719,19 @@ func (cmdContext *CmdContext) CallGetRealmGroups(realmId string) ([]map[string]i
 func (cmdContext *CmdContext) CallGetRealmRepos(realmId string) (
 	[]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetRealmRepos")
+	cmdContext.StartCall("CallGetRealmRepos")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getRealmRepos",
 		[]string{"Log", "RealmId"},
-		[]string{cmdContext.TestDemarcation(), realmId})
+		[]string{cmdContext.CallDemarcation(), realmId})
 	
 	if ! cmdContext.Verify200Response(resp) {
 		return nil, errors.New(resp.Status)
 	}
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	defer resp.Body.Close()
 	
@@ -735,23 +746,24 @@ func (cmdContext *CmdContext) CallGetRealmRepos(realmId string) (
  */
 func (cmdContext *CmdContext) CallGetAllRealms() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetAllRealms")
+	cmdContext.StartCall("CallGetAllRealms")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getAllRealms",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
 	if err != nil { fmt.Println(err.Error()); return nil, err }
-	return responseMap, nil
+	return responseMaps, nil
 }
 
 /*******************************************************************************
@@ -759,23 +771,24 @@ func (cmdContext *CmdContext) CallGetAllRealms() ([]map[string]interface{}, erro
  */
 func (cmdContext *CmdContext) CallGetMyDockerfiles() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyDockerfiles")
+	cmdContext.StartCall("CallGetMyDockerfiles")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyDockerfiles",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
 	if err != nil { fmt.Println(err.Error()); return nil, err }
-	return responseMap, nil
+	return responseMaps, nil
 }
 
 /*******************************************************************************
@@ -783,16 +796,17 @@ func (cmdContext *CmdContext) CallGetMyDockerfiles() ([]map[string]interface{}, 
  */
 func (cmdContext *CmdContext) CallGetMyDockerImages() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyDockerImages")
+	cmdContext.StartCall("CallGetMyDockerImages")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyDockerImages",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -807,23 +821,24 @@ func (cmdContext *CmdContext) CallGetMyDockerImages() ([]map[string]interface{},
  */
 func (cmdContext *CmdContext) CallGetRealmUsers(realmId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetRealmUsers")
+	cmdContext.StartCall("CallGetRealmUsers")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getRealmUsers",
 		[]string{"Log", "RealmId"},
-		[]string{cmdContext.TestDemarcation(), realmId})
+		[]string{cmdContext.CallDemarcation(), realmId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
 	if err != nil { fmt.Println(err.Error()); return nil, err }
-	return responseMap, nil
+	return responseMaps, nil
 }
 
 /*******************************************************************************
@@ -832,14 +847,14 @@ func (cmdContext *CmdContext) CallGetRealmUsers(realmId string) ([]map[string]in
 func (cmdContext *CmdContext) CallCreateRealmAnon(realmName, orgFullName, adminUserId,
 	adminUserFullName, adminEmailAddr, adminPassword string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallCreateRealmAnon")
+	cmdContext.StartCall("CallCreateRealmAnon")
 	
 	var resp1 *http.Response
 	var err error
 	resp1, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"createRealmAnon",
 		[]string{"Log", "UserId", "UserName", "EmailAddress", "Password", "RealmName", "OrgFullName"},
-		[]string{cmdContext.TestDemarcation(), adminUserId, adminUserFullName, adminEmailAddr, adminPassword,
+		[]string{cmdContext.CallDemarcation(), adminUserId, adminUserFullName, adminEmailAddr, adminPassword,
 			realmName, orgFullName})
 	
 		// Returns UserDesc, which contains:
@@ -848,11 +863,10 @@ func (cmdContext *CmdContext) CallCreateRealmAnon(realmName, orgFullName, adminU
 		// UserName string
 		// RealmId string
 		
-	if err != nil { fmt.Println(err.Error()); return nil, err }
-
 	defer resp1.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
-	if ! cmdContext.Verify200Response(resp1) { return nil, errors.New(resp.Status) }
+	if ! cmdContext.Verify200Response(resp1) { return nil, errors.New(resp1.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp1.Body)
@@ -866,16 +880,17 @@ func (cmdContext *CmdContext) CallCreateRealmAnon(realmName, orgFullName, adminU
  */
 func (cmdContext *CmdContext) CallGetRealmByName(realmName string) (map[string]interface{}, error) {
 
-	restContext.StartCall("CallGetRealmByName")
+	cmdContext.StartCall("CallGetRealmByName")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getRealmByName",
 		[]string{"Log", "RealmName"},
-		[]string{cmdContext.TestDemarcation(), realmName})
+		[]string{cmdContext.CallDemarcation(), realmName})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -891,18 +906,19 @@ func (cmdContext *CmdContext) CallGetRealmByName(realmName string) (map[string]i
 func (cmdContext *CmdContext) CallSetPermission(partyId, resourceId string,
 	permissions []bool) (map[string]interface{}, error) {
 
-	restContext.StartCall("CallSetPermission")
+	cmdContext.StartCall("CallSetPermission")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"setPermission",
 		[]string{"Log", "PartyId", "ResourceId", "CanCreateIn", "CanRead", "CanWrite", "CanExecute", "CanDelete"},
-		[]string{cmdContext.TestDemarcation(), partyId, resourceId, BoolToString(permissions[0]),
+		[]string{cmdContext.CallDemarcation(), partyId, resourceId, BoolToString(permissions[0]),
 			BoolToString(permissions[1]), BoolToString(permissions[2]),
 			BoolToString(permissions[3]), BoolToString(permissions[4])})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -918,18 +934,19 @@ func (cmdContext *CmdContext) CallSetPermission(partyId, resourceId string,
 func (cmdContext *CmdContext) CallAddPermission(partyId, resourceId string,
 	permissions []bool) (map[string]interface{}, error) {
 
-	restContext.StartCall("CallAddPermission")
+	cmdContext.StartCall("CallAddPermission")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"addPermission",
 		[]string{"Log", "PartyId", "ResourceId", "CanCreateIn", "CanRead", "CanWrite", "CanExecute", "CanDelete"},
-		[]string{cmdContext.TestDemarcation(), partyId, resourceId, BoolToString(permissions[0]),
+		[]string{cmdContext.CallDemarcation(), partyId, resourceId, BoolToString(permissions[0]),
 			BoolToString(permissions[1]), BoolToString(permissions[2]),
 			BoolToString(permissions[3]), BoolToString(permissions[4])})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -944,16 +961,17 @@ func (cmdContext *CmdContext) CallAddPermission(partyId, resourceId string,
  */
 func (cmdContext *CmdContext) CallGetPermission(partyId, resourceId string) (map[string]interface{}, error) {
 
-	restContext.StartCall("CallGetPermission")
+	cmdContext.StartCall("CallGetPermission")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getPermission",
 		[]string{"Log", "PartyId", "ResourceId"},
-		[]string{cmdContext.TestDemarcation(), partyId, resourceId})
+		[]string{cmdContext.CallDemarcation(), partyId, resourceId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -968,16 +986,17 @@ func (cmdContext *CmdContext) CallGetPermission(partyId, resourceId string) (map
  */
 func (cmdContext *CmdContext) CallGetScanProviders() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetScanProviders")
+	cmdContext.StartCall("CallGetScanProviders")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getScanProviders",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -994,17 +1013,12 @@ func (cmdContext *CmdContext) CallDefineScanConfig(name, desc, repoId, providerN
 	successExpr, successGraphicFilePath string, providerParamNames []string,
 	providerParamValues []string) (map[string]interface{}, error) {
 
-	restContext.StartCall("CallDefineScanConfig")
+	cmdContext.StartCall("CallDefineScanConfig")
 	
 	var paramNames []string = []string{"Log", "Name", "Description", "RepoId", "ProviderName"}
-	var paramValues []string = []string{cmdContext.TestDemarcation(), name, desc, repoId, providerName}
+	var paramValues []string = []string{cmdContext.CallDemarcation(), name, desc, repoId, providerName}
 	paramNames = append(paramNames, providerParamNames...)
 	paramValues = append(paramValues, providerParamValues...)
-	
-	fmt.Println("Param names:")
-	for _, n := range paramNames { fmt.Println("\t" + n) }
-	fmt.Println("Param values:")
-	for _, v := range paramValues { fmt.Println("\t" + v) }
 	
 	var resp *http.Response
 	var err error
@@ -1018,9 +1032,9 @@ func (cmdContext *CmdContext) CallDefineScanConfig(name, desc, repoId, providerN
 			paramValues,
 			successGraphicFilePath)
 	}
-	if ! cmdContext.AssertErrIsNil(err, "at the POST") { return nil, err }
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1037,17 +1051,12 @@ func (cmdContext *CmdContext) CallUpdateScanConfig(scanConfigId, name, desc, pro
 	successExpr, successGraphicFilePath string, providerParamNames []string,
 	providerParamValues []string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallUpdateScanConfig")
+	cmdContext.StartCall("CallUpdateScanConfig")
 	
 	var paramNames []string = []string{"Log", "ScanConfigId", "Name", "Description", "ProviderName"}
-	var paramValues []string = []string{cmdContext.TestDemarcation(), scanConfigId, name, desc, providerName}
+	var paramValues []string = []string{cmdContext.CallDemarcation(), scanConfigId, name, desc, providerName}
 	paramNames = append(paramNames, providerParamNames...)
 	paramValues = append(paramValues, providerParamValues...)
-	
-	fmt.Println("Param names:")
-	for _, n := range paramNames { fmt.Println("\t" + n) }
-	fmt.Println("Param values:")
-	for _, v := range paramValues { fmt.Println("\t" + v) }
 	
 	var resp *http.Response
 	var err error
@@ -1055,6 +1064,7 @@ func (cmdContext *CmdContext) CallUpdateScanConfig(scanConfigId, name, desc, pro
 		"updateScanConfig", paramNames, paramValues, successGraphicFilePath)
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1069,16 +1079,17 @@ func (cmdContext *CmdContext) CallUpdateScanConfig(scanConfigId, name, desc, pro
  */
 func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallScanImage")
+	cmdContext.StartCall("CallScanImage")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"scanImage",
 		[]string{"Log", "ScanConfigId", "ImageObjId"},
-		[]string{cmdContext.TestDemarcation(), scriptId, imageObjId})
+		[]string{cmdContext.CallDemarcation(), scriptId, imageObjId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1114,16 +1125,17 @@ func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[
  */
 func (cmdContext *CmdContext) CallGetMyDesc() (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyDesc")
+	cmdContext.StartCall("CallGetMyDesc")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyDesc",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1138,16 +1150,17 @@ func (cmdContext *CmdContext) CallGetMyDesc() (map[string]interface{}, error) {
  */
 func (cmdContext *CmdContext) CallGetMyGroups() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyGroups")
+	cmdContext.StartCall("CallGetMyGroups")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyGroups",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1162,16 +1175,17 @@ func (cmdContext *CmdContext) CallGetMyGroups() ([]map[string]interface{}, error
  */
 func (cmdContext *CmdContext) CallGetMyRealms() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyRealms")
+	cmdContext.StartCall("CallGetMyRealms")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyRealms",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1186,23 +1200,24 @@ func (cmdContext *CmdContext) CallGetMyRealms() ([]map[string]interface{}, error
  */
 func (cmdContext *CmdContext) CallGetMyRepos() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyRepos")
+	cmdContext.StartCall("CallGetMyRepos")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyRepos",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
 	if err != nil { fmt.Println(err.Error()); return nil, err }
-	return responseMap, nil
+	return responseMaps, nil
 }
 
 /*******************************************************************************
@@ -1211,17 +1226,18 @@ func (cmdContext *CmdContext) CallGetMyRepos() ([]map[string]interface{}, error)
 func (cmdContext *CmdContext) CallReplaceDockerfile(dockerfileId, dockerfilePath,
 	desc string) (map[string]interface{}, error) {
 
-	restContext.StartCall("CallReplaceDockerfile")
+	cmdContext.StartCall("CallReplaceDockerfile")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionFilePost(cmdContext.SessionId,
 		"replaceDockerfile",
 		[]string{"Log", "DockerfileId", "Description"},
-		[]string{cmdContext.TestDemarcation(), dockerfileId, desc},
+		[]string{cmdContext.CallDemarcation(), dockerfileId, desc},
 		dockerfilePath)
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1236,29 +1252,30 @@ func (cmdContext *CmdContext) CallReplaceDockerfile(dockerfileId, dockerfilePath
  */
 func (cmdContext *CmdContext) CallDownloadImage(imageId, filename string) (int64, error) {
 
-	restContext.StartCall("CallDownloadImage")
+	cmdContext.StartCall("CallDownloadImage")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"downloadImage",
 		[]string{"Log", "ImageObjId"},
-		[]string{cmdContext.TestDemarcation(), imageId})
+		[]string{cmdContext.CallDemarcation(), imageId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 
-	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
+	if ! cmdContext.Verify200Response(resp) { return 0, errors.New(resp.Status) }
 	
 	// Check that the server actual sent compressed data
 	var reader io.ReadCloser = resp.Body
 	var file *os.File
 	file, err = os.Create(filename)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 	_, err = io.Copy(file, reader)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 	var fileInfo os.FileInfo
 	fileInfo, err = file.Stat()
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 	cmdContext.AssertThat(fileInfo.Size() > 0, "File has zero size")
 	fmt.Println("File downloaded to " + filename)
 	
@@ -1270,14 +1287,14 @@ func (cmdContext *CmdContext) CallDownloadImage(imageId, filename string) (int64
  */
 func (cmdContext *CmdContext) CallRemGroupUser(groupId, userObjId string) (map[string]interface{}, error) {
 
-	restContext.StartCall("CallRemGroupUser")
+	cmdContext.StartCall("CallRemGroupUser")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remGroupUser",
 		[]string{"Log", "GroupId", "UserObjId"},
-		[]string{cmdContext.TestDemarcation(), groupId, userObjId})
+		[]string{cmdContext.CallDemarcation(), groupId, userObjId})
 	
 	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
@@ -1294,14 +1311,14 @@ func (cmdContext *CmdContext) CallRemGroupUser(groupId, userObjId string) (map[s
  */
 func (cmdContext *CmdContext) CallReenableUser(userObjId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallReenableUser")
+	cmdContext.StartCall("CallReenableUser")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"reenableUser",
 		[]string{"Log", "UserObjId"},
-		[]string{cmdContext.TestDemarcation(), userObjId})
+		[]string{cmdContext.CallDemarcation(), userObjId})
 	
 	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
@@ -1318,14 +1335,14 @@ func (cmdContext *CmdContext) CallReenableUser(userObjId string) (map[string]int
  */
 func (cmdContext *CmdContext) CallRemRealmUser(realmId, userObjId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallRemRealmUser")
+	cmdContext.StartCall("CallRemRealmUser")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remRealmUser",
 		[]string{"Log", "RealmId", "UserObjId"},
-		[]string{cmdContext.TestDemarcation(), realmId, userObjId})
+		[]string{cmdContext.CallDemarcation(), realmId, userObjId})
 	
 	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
@@ -1342,14 +1359,14 @@ func (cmdContext *CmdContext) CallRemRealmUser(realmId, userObjId string) (map[s
  */
 func (cmdContext *CmdContext) CallDeactivateRealm(realmId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallDeactivateRealm")
+	cmdContext.StartCall("CallDeactivateRealm")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"deactivateRealm",
 		[]string{"Log", "RealmId"},
-		[]string{cmdContext.TestDemarcation(), realmId})
+		[]string{cmdContext.CallDemarcation(), realmId})
 	
 	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
@@ -1366,14 +1383,14 @@ func (cmdContext *CmdContext) CallDeactivateRealm(realmId string) (map[string]in
  */
 func (cmdContext *CmdContext) CallDeleteRepo(repoId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallDeleteRepo")
+	cmdContext.StartCall("CallDeleteRepo")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"deleteRepo",
 		[]string{"Log", "RepoId"},
-		[]string{cmdContext.TestDemarcation(), repoId})
+		[]string{cmdContext.CallDemarcation(), repoId})
 	
 	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
@@ -1390,14 +1407,14 @@ func (cmdContext *CmdContext) CallDeleteRepo(repoId string) (map[string]interfac
  */
 func (cmdContext *CmdContext) CallRemPermission(partyId, resourceId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallRemPermission")
+	cmdContext.StartCall("CallRemPermission")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remPermission",
 		[]string{"Log", "PartyId", "ResourceId"},
-		[]string{cmdContext.TestDemarcation(), partyId, resourceId})
+		[]string{cmdContext.CallDemarcation(), partyId, resourceId})
 	
 	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
@@ -1415,16 +1432,17 @@ func (cmdContext *CmdContext) CallRemPermission(partyId, resourceId string) (map
  */
 func (cmdContext *CmdContext) CallGetUserEvents(userId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetUserEvents")
+	cmdContext.StartCall("CallGetUserEvents")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getUserEvents",
 		[]string{"Log", "UserId"},
-		[]string{cmdContext.TestDemarcation(), userId})
+		[]string{cmdContext.CallDemarcation(), userId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1439,16 +1457,17 @@ func (cmdContext *CmdContext) CallGetUserEvents(userId string) ([]map[string]int
  */
 func (cmdContext *CmdContext) CallGetDockerImageEvents(imageObjId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetDockerImageEvents")
+	cmdContext.StartCall("CallGetDockerImageEvents")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerImageEvents",
 		[]string{"Log", "ImageObjId"},
-		[]string{cmdContext.TestDemarcation(), imageObjId})
+		[]string{cmdContext.CallDemarcation(), imageObjId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1463,15 +1482,16 @@ func (cmdContext *CmdContext) CallGetDockerImageEvents(imageObjId string) ([]map
  */
 func (cmdContext *CmdContext) CallGetDockerImageStatus(imageObjId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetImageStatus")
+	cmdContext.StartCall("CallGetImageStatus")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerImageStatus",
 		[]string{"Log", "ImageObjId"},
-		[]string{cmdContext.TestDemarcation(), imageObjId},
+		[]string{cmdContext.CallDemarcation(), imageObjId},
 		)
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1498,16 +1518,17 @@ func (cmdContext *CmdContext) CallGetDockerImageStatus(imageObjId string) (map[s
 func (cmdContext *CmdContext) CallGetDockerfileEvents(dockerfileId string,
 	dockerfilePath string) ([]map[string]interface{}, error) {
 
-	restContext.StartCall("CallGetDockerfileEvents")
+	cmdContext.StartCall("CallGetDockerfileEvents")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerfileEvents",
 		[]string{"Log", "DockerfileId"},
-		[]string{cmdContext.TestDemarcation(), dockerfileId})
+		[]string{cmdContext.CallDemarcation(), dockerfileId})
 	
 	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
@@ -1523,15 +1544,16 @@ func (cmdContext *CmdContext) CallGetDockerfileEvents(dockerfileId string,
 func (cmdContext *CmdContext) CallDefineFlag(repoId, flagName, desc,
 	imageFilePath string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallDefineFlag")
+	cmdContext.StartCall("CallDefineFlag")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionFilePost(cmdContext.SessionId,
 		"defineFlag",
 		[]string{"Log", "RepoId", "Name", "Description"},
-		[]string{cmdContext.TestDemarcation(), repoId, flagName, desc},
+		[]string{cmdContext.CallDemarcation(), repoId, flagName, desc},
 		imageFilePath)
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1548,14 +1570,15 @@ func (cmdContext *CmdContext) CallDefineFlag(repoId, flagName, desc,
 func (cmdContext *CmdContext) CallGetScanConfigDesc(scanConfigId string,
 	expectToFindIt bool) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetScanConfigDesc")
+	cmdContext.StartCall("CallGetScanConfigDesc")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getScanConfigDesc",
 		[]string{"Log", "ScanConfigId"},
-		[]string{cmdContext.TestDemarcation(), scanConfigId})
+		[]string{cmdContext.CallDemarcation(), scanConfigId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1571,14 +1594,15 @@ func (cmdContext *CmdContext) CallGetScanConfigDesc(scanConfigId string,
  */
 func (cmdContext *CmdContext) CallChangePassword(userId, oldPswd, newPswd string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallChangePassword")
+	cmdContext.StartCall("CallChangePassword")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"changePassword",
 		[]string{"Log", "UserId", "OldPassword", "NewPassword"},
-		[]string{cmdContext.TestDemarcation(), userId, oldPswd, newPswd})
+		[]string{cmdContext.CallDemarcation(), userId, oldPswd, newPswd})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1595,14 +1619,15 @@ func (cmdContext *CmdContext) CallChangePassword(userId, oldPswd, newPswd string
  */
 func (cmdContext *CmdContext) CallGetFlagDesc(flagId string, expectToFindIt bool) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetFlagDesc")
+	cmdContext.StartCall("CallGetFlagDesc")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getFlagDesc",
 		[]string{"Log", "FlagId"},
-		[]string{cmdContext.TestDemarcation(), flagId})
+		[]string{cmdContext.CallDemarcation(), flagId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1618,27 +1643,28 @@ func (cmdContext *CmdContext) CallGetFlagDesc(flagId string, expectToFindIt bool
  */
 func (cmdContext *CmdContext) CallGetFlagImage(flagId string, filename string) (int64, error) {
 	
-	restContext.StartCall("CallGetFlagImage")
+	cmdContext.StartCall("CallGetFlagImage")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getFlagImage",
 		[]string{"Log", "FlagId"},
-		[]string{cmdContext.TestDemarcation(), flagId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
+		[]string{cmdContext.CallDemarcation(), flagId})
+	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 	
-	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
+	if ! cmdContext.Verify200Response(resp) { return 0, errors.New(resp.Status) }
 	
 	var reader io.ReadCloser = resp.Body
 	var file *os.File
 	file, err = os.Create(filename)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 	_, err = io.Copy(file, reader)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 	var fileInfo os.FileInfo
 	fileInfo, err = file.Stat()
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
+	if ! cmdContext.AssertErrIsNil(err, "") { return 0, err }
 	cmdContext.AssertThat(fileInfo.Size() > 0, "File has zero size")
 	fmt.Println("Downloaded flag graphic image " + filename)
 	
@@ -1650,14 +1676,15 @@ func (cmdContext *CmdContext) CallGetFlagImage(flagId string, filename string) (
  */
 func (cmdContext *CmdContext) CallGetMyScanConfigs() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyScanConfigs")
+	cmdContext.StartCall("CallGetMyScanConfigs")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyScanConfigs",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1673,14 +1700,15 @@ func (cmdContext *CmdContext) CallGetMyScanConfigs() ([]map[string]interface{}, 
  */
 func (cmdContext *CmdContext) CallGetScanConfigDescByName(repoId, scanConfigName string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetScanConfigDescByName")
+	cmdContext.StartCall("CallGetScanConfigDescByName")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getScanConfigDescByName",
 		[]string{"Log", "RepoId", "ScanConfigName"},
-		[]string{cmdContext.TestDemarcation(), repoId, scanConfigName})
+		[]string{cmdContext.CallDemarcation(), repoId, scanConfigName})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1696,14 +1724,15 @@ func (cmdContext *CmdContext) CallGetScanConfigDescByName(repoId, scanConfigName
  */
 func (cmdContext *CmdContext) CallRemScanConfig(scanConfigId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallRemScanConfig")
+	cmdContext.StartCall("CallRemScanConfig")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remScanConfig",
 		[]string{"Log", "ScanConfigId"},
-		[]string{cmdContext.TestDemarcation(), scanConfigId})
+		[]string{cmdContext.CallDemarcation(), scanConfigId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) {
@@ -1722,14 +1751,15 @@ func (cmdContext *CmdContext) CallRemScanConfig(scanConfigId string) (map[string
  */
 func (cmdContext *CmdContext) CallGetMyFlags() ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetMyFlags")
+	cmdContext.StartCall("CallGetMyFlags")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getMyFlags",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "while performing SendSessionPost") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1745,14 +1775,15 @@ func (cmdContext *CmdContext) CallGetMyFlags() ([]map[string]interface{}, error)
  */
 func (cmdContext *CmdContext) CallGetFlagDescByName(repoId, flagName string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetFlagDescByName")
+	cmdContext.StartCall("CallGetFlagDescByName")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getFlagDescByName",
 		[]string{"Log", "RepoId", "FlagName"},
-		[]string{cmdContext.TestDemarcation(), repoId, flagName})
+		[]string{cmdContext.CallDemarcation(), repoId, flagName})
+	defer resp.Body.Close()
 	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1768,14 +1799,15 @@ func (cmdContext *CmdContext) CallGetFlagDescByName(repoId, flagName string) (ma
  */
 func (cmdContext *CmdContext) CallRemFlag(flagId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallRemFlag")
+	cmdContext.StartCall("CallRemFlag")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remFlag",
 		[]string{"Log", "FlagId"},
-		[]string{cmdContext.TestDemarcation(), flagId})
+		[]string{cmdContext.CallDemarcation(), flagId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1791,14 +1823,15 @@ func (cmdContext *CmdContext) CallRemFlag(flagId string) (map[string]interface{}
  */
 func (cmdContext *CmdContext) CallRemDockerImage(imageId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallRemDockerImage")
+	cmdContext.StartCall("CallRemDockerImage")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remDockerImage",
 		[]string{"Log", "ImageId"},
-		[]string{cmdContext.TestDemarcation(), imageId})
+		[]string{cmdContext.CallDemarcation(), imageId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1814,14 +1847,15 @@ func (cmdContext *CmdContext) CallRemDockerImage(imageId string) (map[string]int
  */
 func (cmdContext *CmdContext) CallRemImageVersion(imageVersionId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallRemImageVersion")
+	cmdContext.StartCall("CallRemImageVersion")
 
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"remImageVersion",
 		[]string{"Log", "ImageVersionId"},
-		[]string{cmdContext.TestDemarcation(), imageVersionId})
+		[]string{cmdContext.CallDemarcation(), imageVersionId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1836,14 +1870,15 @@ func (cmdContext *CmdContext) CallRemImageVersion(imageVersionId string) (map[st
  */
 func (cmdContext *CmdContext) CallGetDockerImageVersions(imageId string) ([]map[string]interface{}, error) {
 	
-	restContext.StartCall("CallGetDockerImageVersions")
+	cmdContext.StartCall("CallGetDockerImageVersions")
 
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"getDockerImageVersions",
 		[]string{"Log", "DockerImageId"},
-		[]string{cmdContext.TestDemarcation(), imageId})
+		[]string{cmdContext.CallDemarcation(), imageId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) {
@@ -1863,14 +1898,16 @@ func (cmdContext *CmdContext) CallGetDockerImageVersions(imageId string) ([]map[
 func (cmdContext *CmdContext) CallUpdateUserInfo(userId, userName,
 	email string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallUpdateUserInfo")
+	cmdContext.StartCall("CallUpdateUserInfo")
 
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"updateUserInfo",
 		[]string{"Log", "UserId", "UserName", "EmailAddress"},
-		[]string{cmdContext.TestDemarcation(), userId, userName, email})
+		[]string{cmdContext.CallDemarcation(), userId, userName, email})
+	defer resp.Body.Close()
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	if ! cmdContext.AssertErrIsNil(err, "when calling updateUserInfo") { return nil, err }
 	
 	var responseMap map[string]interface{}
@@ -1883,14 +1920,15 @@ func (cmdContext *CmdContext) CallUpdateUserInfo(userId, userName,
  */
 func (cmdContext *CmdContext) CallUserExists(userId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallUserExists")
+	cmdContext.StartCall("CallUserExists")
 
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"userExists",
 		[]string{"Log", "UserId"},
-		[]string{cmdContext.TestDemarcation(), userId})
+		[]string{cmdContext.CallDemarcation(), userId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	var responseMap map[string]interface{}
@@ -1907,17 +1945,21 @@ func (cmdContext *CmdContext) CallUserExists(userId string) (map[string]interfac
 func (cmdContext *CmdContext) CallUseScanConfigForImage(dockerImageId,
 	scanConfigId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallUseScanConfigForImage")
+	cmdContext.StartCall("CallUseScanConfigForImage")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"useScanConfigForImage",
 		[]string{"Log", "DockerImageId", "ScanConfigId"},
-		[]string{cmdContext.TestDemarcation(), dockerImageId, scanConfigId})
+		[]string{cmdContext.CallDemarcation(), dockerImageId, scanConfigId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
+	var responseMap map[string]interface{}
+	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
+	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1927,14 +1969,15 @@ func (cmdContext *CmdContext) CallUseScanConfigForImage(dockerImageId,
 func (cmdContext *CmdContext) CallStopUsingScanConfigForImage(dockerImageId,
 	scanConfigId string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallStopUsingScanConfigForImage")
+	cmdContext.StartCall("CallStopUsingScanConfigForImage")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"stopUsingScanConfigForImage",
 		[]string{"Log", "DockerImageId", "ScanConfigId"},
-		[]string{cmdContext.TestDemarcation(), dockerImageId, scanConfigId})
+		[]string{cmdContext.CallDemarcation(), dockerImageId, scanConfigId})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1949,7 +1992,7 @@ func (cmdContext *CmdContext) CallStopUsingScanConfigForImage(dockerImageId,
  */
 func (cmdContext *CmdContext) CallEnableEmailVerification(enabled bool) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallEnableEmailVerification")
+	cmdContext.StartCall("CallEnableEmailVerification")
 	
 	var resp *http.Response
 	var err error
@@ -1963,7 +2006,8 @@ func (cmdContext *CmdContext) CallEnableEmailVerification(enabled bool) (map[str
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"enableEmailVerification",
 		[]string{"Log", "VerificationEnabled"},
-		[]string{cmdContext.TestDemarcation(), flag})
+		[]string{cmdContext.CallDemarcation(), flag})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
@@ -1978,14 +2022,15 @@ func (cmdContext *CmdContext) CallEnableEmailVerification(enabled bool) (map[str
  */
 func (cmdContext *CmdContext) CallValidateAccountVerificationToken(token string) (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallValidateAccountVerificationToken")
+	cmdContext.StartCall("CallValidateAccountVerificationToken")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
 		"validateAccountVerificationToken",
 		[]string{"Log", "AccountVerificationToken"},
-		[]string{cmdContext.TestDemarcation(), token})
+		[]string{cmdContext.CallDemarcation(), token})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	var responseMap map[string]interface{}
@@ -2001,14 +2046,15 @@ func (cmdContext *CmdContext) CallValidateAccountVerificationToken(token string)
  */
 func (cmdContext *CmdContext) CallClearAll() (map[string]interface{}, error) {
 	
-	restContext.StartCall("CallClearAll")
+	cmdContext.StartCall("CallClearAll")
 	
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionGet("",
 		"clearAll",
 		[]string{"Log"},
-		[]string{cmdContext.TestDemarcation()})
+		[]string{cmdContext.CallDemarcation()})
+	defer resp.Body.Close()
 	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }

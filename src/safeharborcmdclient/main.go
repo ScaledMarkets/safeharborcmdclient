@@ -13,18 +13,18 @@ package main
 
 import (
 	"fmt"
-	//"net/http"
-	"net/url"
+	"net/http"
+	//"net/url"
 	"os"
 	"flag"
-	"time"
-	"strings"
+	//"time"
+	//"strings"
 	"reflect"
-	"strconv"
+	//"strconv"
 	"encoding/json"
 	
 	// SafeHarbor packages:
-	"utilities/rest"
+	//"utilities/rest"
 )
 
 const (
@@ -37,30 +37,28 @@ func main() {
 	var scheme *string = flag.String("s", "http", "Protocol scheme (one of http, https, unix)")
 	var hostname *string = flag.String("h", "localhost", "Internet address of server.")
 	var port *int = flag.Int("p", 80, "Port server is on.")
-	var nolargefiles *bool = flag.Bool("nolarge", false, "Do not perform any large file transfers")
-	var stopOnFirstError *bool = flag.Bool("stop", false, "Stop after the first error.")
-	var redisPswd *string = flag.String("redispswd", "ahdal8934k383898&*kdu&^", "Redis password")
+	var userId *string = flag.String("u", "", "User Id for accessing the Safe Harbor server")
+	var password *string = flag.String("s", "", "Password for accessing the Safe Harbor server")
 	
-	var keys []reflect.Value = reflect.ValueOf(testSuite).MapKeys()
-	var allTestNames string
-	for i, key := range keys {
-		if i > 0 { allTestNames = allTestNames + "," }
-		allTestNames = allTestNames + key.String()
-	}
-	var tests *string = flag.String("tests", allTestNames,
-		"Perform the tests listed, comma-separated.")
-
 	flag.Parse()
 
+	// Create the object on which to make the method call.
+	var cmdContext *CmdContext
+	cmdContext = CreateCmdContext(*scheme, *hostname, *port,
+		*userId, *password, SetSessionId)
+	cmdContext.Print()
+	var cmdContextValue = reflect.ValueOf(cmdContext)
+	
+	// Check arguments.
 	if *help {
 		fmt.Println("Help:")
-		utils.Usage()
+		usage(cmdContextValue)
 		os.Exit(0)
 	}
 	
 	var args []string = flag.Args()
 	if len(args) == 0 {
-		usage()
+		usage(cmdContextValue)
 		os.Exit(2)
 	}
 	
@@ -74,21 +72,14 @@ func main() {
 		}
 	}
 	
-	// Create the object on which to make the method call.
-	var cmdContext = &CmdContext{
-		RestContext: utils.NewRestContext(*scheme, *hostname, *port, utils.SetSessionId,
-			*stopOnFirstError, *redisPswd, *nolargefiles)
-	}
-	cmdContext.Print()
-	
 	// Identify the method of CommandContext, using reflection.
 	var method = reflect.ValueOf(cmdContext).MethodByName(command)
-	if err != nil {
-		fmt.Println("Method unknown: " + command + "; " + err.Error())
+	if method.IsNil() {
+		fmt.Println("Method unknown: " + command)
 		os.Exit(2)
 	}
 	if ! method.IsValid() {
-		fmt.Println("Method invalid: " + command + "; " + err.Error())
+		fmt.Println("Method invalid: " + command)
 		os.Exit(2)
 	}
 	
@@ -99,30 +90,53 @@ func main() {
 		inVals[i] = reflect.ValueOf(arg)
 	}
 	
+	// Authenticate to server - this returns a SessionId.
+	var restResponse map[string]interface{}
+	var err error
+	restResponse, err = cmdContext.CallAuthenticate(*userId, *password)
+	if err != nil {
+		fmt.Println("Authentication with server failed: " + err.Error())
+		os.Exit(2)
+	}
+	
+	var obj = restResponse["UniqueSessionId"]
+	if obj == nil {
+		fmt.Println("Error: UniqueSessionId not found in response from server")
+		os.Exit(2)
+	}
+	var sessionId string
+	var isType bool
+	sessionId, isType = obj.(string)
+	if ! isType {
+		fmt.Println("Error: UniqueSessionId is not a string")
+		os.Exit(2)
+	}
+	cmdContext.SetSessionId(sessionId)
+	
 	// Perform the method call.
 	// All methods return a pair of objects of one of these sets of object types:
 	//	map[string]interface{}, error
 	//	[]map[string]interface{}, error
 	//	int64, error - when a file is downloaded
-	var results []reflect.Value = v.Call(inVals)
+	var results []reflect.Value = cmdContextValue.Call(inVals)
 	if len(results) != 2 {
 		fmt.Println(fmt.Sprintf(
 			"%d return value(s) when calling %s: expected two", len(results), command))
 		os.Exit(2)
 	}
 	
-	var err error
 	if results[1].IsNil() { // no error was returned
 		if results[0].IsNil() {  // error - no result was returned
 			
 		} else { // ok - there was a result, and no error was returned
 			
 			// Determine result type.
-			switch result := results[0].(type) {
+			var iResult interface{} = results[0]
+			switch result := iResult.(type) {
 				case map[string]interface{}, []map[string]interface{}:
 					// Convert the result to JSON and print it.
 					var jb []byte
-					jb, err = json.Marshall(result)
+					jb, err = json.Marshal(result)
 					if err != nil { // error unmarshalling result
 						fmt.Println("Error unmarshalling result: " + err.Error())
 						os.Exit(2)
@@ -142,7 +156,8 @@ func main() {
 		}
 	} else { // an error was returned
 		var isType bool
-		err, isType = results[1].(error)
+		var iResult interface{} = results[1]
+		err, isType = iResult.(error)
 		if ! isType { // error - unexpected type
 			fmt.Println("Second return object is not nil but is not an error object")
 			os.Exit(2)
@@ -153,21 +168,45 @@ func main() {
 	}
 }
 
-func usage() {
+func SetSessionId(req *http.Request, sessionId string) {
+	
+	// Set cookie containing the session Id.
+	var cookie = &http.Cookie{
+		Name: "SessionId",
+		Value: sessionId,
+		//Path: 
+		//Domain: 
+		//Expires: 
+		//RawExpires: 
+		MaxAge: 86400,  // 24 hrs
+		Secure: false,  //....change to true later.
+		HttpOnly: true,
+		//Raw: 
+		//Unparsed: 
+	}
+	
+	req.AddCookie(cookie)
+}
+
+func usage(v reflect.Value) {
 	fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
 	flag.PrintDefaults()
 	
 	fmt.Println("\tCommands:")
 	for m := 1; m <= v.NumMethod(); m++ {
-		var meth Value = v.Method(m-1)
+		var meth reflect.Value = v.Method(m-1)
 		var methodType = meth.Type()
 		fmt.Print("\t\t" + methodType.Name())
 		var numArgs = methodType.NumIn()
 		for a := 1; a <= numArgs; a++ {
-			var argType Type = methodType.In(a-1)
+			var argType reflect.Type = methodType.In(a-1)
 			fmt.Print(" " + argType.Name())
 		}
 		fmt.Println()
 	}
 	
+}
+
+func BoolToString(b bool) string {
+	return fmt.Sprintf("%t", b)
 }
