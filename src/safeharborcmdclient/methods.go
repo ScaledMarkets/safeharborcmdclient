@@ -26,7 +26,7 @@ func (cmdContext *CmdContext) CallGetGroupDesc(groupId string) (map[string]inter
 	
 	defer resp.Body.Close()
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
 	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil, err }
@@ -49,10 +49,10 @@ func (cmdContext *CmdContext) CallGetRepoDesc(repoId string) (map[string]interfa
 	
 	defer resp.Body.Close()
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return }
+	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil, err }
 	rest.PrintMap(responseMap)
 	
 	// Expect a RepoDesc
@@ -75,13 +75,12 @@ func (cmdContext *CmdContext) CallGetDockerImageDesc(dockerImageId string) (map[
 	defer resp.Body.Close()
 	
 	if ! cmdContext.Verify200Response(resp) {
-		cmdContext.FailTest()
-		return nil
+		return nil, errors.New(resp.Status)
 	}
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil, err }
 	
 	// Expect a DockerImageDesc or a DockerImageVersionDesc.
 	return responseMap, nil
@@ -102,14 +101,13 @@ func (cmdContext *CmdContext) CallRemDockerfile(dockerfileId string) (map[string
 	
 	defer resp.Body.Close()
 	if err != nil {
-		cmdContext.FailTest()
-		return
+		return nil, errors.New(resp.Status)
 	}
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil, err }
 	
 	return responseMap, nil
 }
@@ -129,10 +127,10 @@ func (cmdContext *CmdContext) CallGetDockerfileDesc(dockerfileId string) (map[st
 	
 	defer resp.Body.Close()
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil, err }
 	
 	// Expect a DockerfileDesc
 	return responseMap, nil
@@ -154,7 +152,7 @@ func (cmdContext *CmdContext) CallCreateRealm(realmName, orgFullName,
 	
 	defer resp.Body.Close()
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Get the realm Id that is returned in the response body.
 	var responseMap map[string]interface{}
@@ -178,12 +176,12 @@ func (cmdContext *CmdContext) TestGetRealmByName(realmName string) (map[string]i
 	
 	defer resp.Body.Close()
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Get the realm Id that is returned in the response body.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	// Should return a RealmDesc:
 	//	HTTPStatusCode int
@@ -213,7 +211,7 @@ func (cmdContext *CmdContext) CallCreateUser(userId string, userName string,
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
@@ -237,12 +235,12 @@ func (cmdContext *CmdContext) CallAuthenticate(userId string, pswd string) (map[
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Get the repo Id that is returned in the response body.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "", false }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -262,11 +260,11 @@ func (cmdContext *CmdContext) CallDisableUser(userObjId string) (map[string]inte
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return false }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -286,7 +284,7 @@ func (cmdContext *CmdContext) CallDeleteGroup(groupId string) (map[string]interf
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
@@ -294,7 +292,7 @@ func (cmdContext *CmdContext) CallDeleteGroup(groupId string) (map[string]interf
 }
 
 /*******************************************************************************
- * If successful, return true.
+ * 
  */
 func (cmdContext *CmdContext) CallLogout() (map[string]interface{}, error) {
 	
@@ -309,11 +307,11 @@ func (cmdContext *CmdContext) CallLogout() (map[string]interface{}, error) {
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return false }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -345,16 +343,16 @@ func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
 			optDockerfilePath)
 		fmt.Println("HTTP file post completed")
 	}
-	if ! cmdContext.AssertErrIsNil(err, "") { return "" }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Get the repo Id that is returned in the response body.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "" }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -375,16 +373,16 @@ func (cmdContext *CmdContext) CallAddDockerfile(repoId string, dockerfilePath st
 		[]string{"Log", "RepoId", "Description"},
 		[]string{cmdContext.TestDemarcation(), repoId, desc},
 		dockerfilePath)
-	if ! cmdContext.AssertErrIsNil(err, "") { return "", nil }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Get the DockerfileDesc that is returned.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "", nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -405,11 +403,11 @@ func (cmdContext *CmdContext) CallGetDockerfiles(repoId string) ([]map[string]in
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -443,7 +441,7 @@ func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId str
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Get the repo Id that is returned in the response body.
 	/* DockerImageVersionDesc:
@@ -460,7 +458,7 @@ func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId str
 	*/
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "", "", nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -494,12 +492,12 @@ func (cmdContext *CmdContext) CallAddAndExecDockerfile(repoId string, desc strin
 
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Returns a DockerImageVersionDesc.
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "", "", "", nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -518,15 +516,14 @@ func (cmdContext *CmdContext) CallGetEventDesc(eventId string) (map[string]inter
 		[]string{cmdContext.TestDemarcation(), eventId})
 	defer resp.Body.Close()
 	if err != nil {
-		cmdContext.FailTest()
-		return nil
+		return nil, errors.New(resp.Status)
 	}
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -546,15 +543,14 @@ func (cmdContext *CmdContext) CallGetDockerImages(repoId string) ([]map[string]i
 	
 	defer resp.Body.Close()
 	if err != nil {
-		cmdContext.FailTest()
-		return nil
+		return nil, errors.New(resp.Status)
 	}
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -575,11 +571,11 @@ func (cmdContext *CmdContext) CallGetUserDesc(userId string) (map[string]interfa
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -603,11 +599,11 @@ func (cmdContext *CmdContext) CallCreateGroup(realmId, name, description string,
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "" } // returns GroupDesc
+	if err != nil { fmt.Println(err.Error()); return nil, err } // returns GroupDesc
 	// Id
 	// Name
 	// Description
@@ -630,11 +626,11 @@ func (cmdContext *CmdContext) CallGetGroupUsers(groupId string) (map[string]inte
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)  // returns [UserDesc]
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
 	return responseMaps, nil
 }
@@ -655,11 +651,11 @@ func (cmdContext *CmdContext) CallAddGroupUser(groupId, userId string) (map[stri
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return false }  // returns Result
+	if err != nil { fmt.Println(err.Error()); return nil, err }  // returns Result
 	// Status - A value of “0” indicates success.
 	// Message
 	return responseMap, nil
@@ -681,11 +677,11 @@ func (cmdContext *CmdContext) CallMoveUserToRealm(userObjId, realmId string) (ma
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -705,11 +701,11 @@ func (cmdContext *CmdContext) CallGetRealmGroups(realmId string) ([]map[string]i
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)  // returns [GroupDesc]
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	// Id
 	// Name
 	// Description
@@ -732,14 +728,14 @@ func (cmdContext *CmdContext) CallGetRealmRepos(realmId string) (
 		[]string{cmdContext.TestDemarcation(), realmId})
 	
 	if ! cmdContext.Verify200Response(resp) {
-		cmdContext.FailTest()
+		return nil, errors.New(resp.Status)
 	}
 	
 	defer resp.Body.Close()
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil, nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -759,11 +755,11 @@ func (cmdContext *CmdContext) CallGetAllRealms() ([]map[string]interface{}, erro
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -783,11 +779,11 @@ func (cmdContext *CmdContext) CallGetMyDockerfiles() ([]map[string]interface{}, 
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -807,11 +803,11 @@ func (cmdContext *CmdContext) CallGetMyDockerImages() ([]map[string]interface{},
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -831,11 +827,11 @@ func (cmdContext *CmdContext) CallGetRealmUsers(realmId string) ([]map[string]in
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -861,15 +857,15 @@ func (cmdContext *CmdContext) CallCreateRealmAnon(realmName, orgFullName, adminU
 		// UserName string
 		// RealmId string
 		
-	if err != nil { fmt.Println(err.Error()); return "", "", nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	defer resp1.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp1) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp1) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp1.Body)
-	if err != nil { fmt.Println(err.Error()); return "", "", nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	return responseMap, nil
 }
@@ -890,11 +886,11 @@ func (cmdContext *CmdContext) CallGetRealmByName(realmName string) (map[string]i
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -917,11 +913,11 @@ func (cmdContext *CmdContext) CallSetPermission(partyId, resourceId string,
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -944,11 +940,11 @@ func (cmdContext *CmdContext) CallAddPermission(partyId, resourceId string,
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -968,11 +964,11 @@ func (cmdContext *CmdContext) CallGetPermission(partyId, resourceId string) (map
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil, err }
 	return responseMap, nil
 }
 
@@ -992,11 +988,11 @@ func (cmdContext *CmdContext) CallGetScanProviders() ([]map[string]interface{}, 
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -1031,15 +1027,15 @@ func (cmdContext *CmdContext) CallDefineScanConfig(name, desc, repoId, providerN
 			paramValues,
 			successGraphicFilePath)
 	}
-	cmdContext.AssertErrIsNil(err, "at the POST")
+	if ! cmdContext.AssertErrIsNil(err, "at the POST") { return nil, err }
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap")
+	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1069,11 +1065,11 @@ func (cmdContext *CmdContext) CallUpdateScanConfig(scanConfigId, name, desc, pro
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1093,19 +1089,18 @@ func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	rest.PrintMap(responseMap)
 	
 	var payload []interface{}
 	var isType bool
 	payload, isType = responseMap["payload"].([]interface{})
 	if !cmdContext.AssertThat(isType, "payload is not a []interface{}") {
-		cmdContext.FailTest()
-		return nil
+		return nil, errors.New(resp.Status)
 	}
 	
 	var eltFieldMaps = make([]map[string]interface{}, 0)
@@ -1116,8 +1111,7 @@ func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[
 		if cmdContext.AssertThat(isType, "element is not a map[string]interface{}") {
 			eltFieldMaps = append(eltFieldMaps, eltFieldMap)
 		} else {
-			cmdContext.FailTest()
-			return nil
+			return nil, errors.New(resp.Status)
 		}
 	}
 	
@@ -1140,11 +1134,11 @@ func (cmdContext *CmdContext) CallGetMyDesc() (map[string]interface{}, error) {
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return "", nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -1164,11 +1158,11 @@ func (cmdContext *CmdContext) CallGetMyGroups() ([]map[string]interface{}, error
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -1188,11 +1182,11 @@ func (cmdContext *CmdContext) CallGetMyRealms() ([]map[string]interface{}, error
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -1212,11 +1206,11 @@ func (cmdContext *CmdContext) CallGetMyRepos() ([]map[string]interface{}, error)
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMap, nil
 }
 
@@ -1238,18 +1232,18 @@ func (cmdContext *CmdContext) CallReplaceDockerfile(dockerfileId, dockerfilePath
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDownloadImage(imageId, filename string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) CallDownloadImage(imageId, filename string) (int64, error) {
 
 	restContext.StartCall("CallDownloadImage")
 	
@@ -1262,24 +1256,22 @@ func (cmdContext *CmdContext) CallDownloadImage(imageId, filename string) (map[s
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
-	var responseMap map[string]interface{}
-	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	// Check that the server actual sent compressed data
 	var reader io.ReadCloser = resp.Body
 	var file *os.File
 	file, err = os.Create(filename)
-	cmdContext.AssertErrIsNil(err, "")
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	_, err = io.Copy(file, reader)
-	cmdContext.AssertErrIsNil(err, "")
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	var fileInfo os.FileInfo
 	fileInfo, err = file.Stat()
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	cmdContext.AssertThat(fileInfo.Size() > 0, "File has zero size")
 	fmt.Println("File downloaded to " + filename)
-	return responseMap, nil
+	
+	return fileInfo.Size(), nil
 }
 
 /*******************************************************************************
@@ -1297,12 +1289,12 @@ func (cmdContext *CmdContext) CallRemGroupUser(groupId, userObjId string) (map[s
 		[]string{cmdContext.TestDemarcation(), groupId, userObjId})
 	
 	defer resp.Body.Close()
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1321,12 +1313,12 @@ func (cmdContext *CmdContext) CallReenableUser(userObjId string) (map[string]int
 		[]string{cmdContext.TestDemarcation(), userObjId})
 	
 	defer resp.Body.Close()
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 	
@@ -1345,12 +1337,12 @@ func (cmdContext *CmdContext) CallRemRealmUser(realmId, userObjId string) (map[s
 		[]string{cmdContext.TestDemarcation(), realmId, userObjId})
 	
 	defer resp.Body.Close()
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1369,12 +1361,12 @@ func (cmdContext *CmdContext) CallDeactivateRealm(realmId string) (map[string]in
 		[]string{cmdContext.TestDemarcation(), realmId})
 	
 	defer resp.Body.Close()
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1393,12 +1385,12 @@ func (cmdContext *CmdContext) CallDeleteRepo(repoId string) (map[string]interfac
 		[]string{cmdContext.TestDemarcation(), repoId})
 	
 	defer resp.Body.Close()
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1417,12 +1409,12 @@ func (cmdContext *CmdContext) CallRemPermission(partyId, resourceId string) (map
 		[]string{cmdContext.TestDemarcation(), partyId, resourceId})
 	
 	defer resp.Body.Close()
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	return responseMap, nil
 }
@@ -1443,11 +1435,11 @@ func (cmdContext *CmdContext) CallGetUserEvents(userId string) ([]map[string]int
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -1467,11 +1459,11 @@ func (cmdContext *CmdContext) CallGetDockerImageEvents(imageObjId string) ([]map
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -1489,13 +1481,13 @@ func (cmdContext *CmdContext) CallGetDockerImageStatus(imageObjId string) (map[s
 		[]string{"Log", "ImageObjId"},
 		[]string{cmdContext.TestDemarcation(), imageObjId},
 		)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	//EventId string
 	//When time.Time
@@ -1526,7 +1518,7 @@ func (cmdContext *CmdContext) CallGetDockerfileEvents(dockerfileId string,
 	
 	defer resp.Body.Close()
 
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
@@ -1549,12 +1541,12 @@ func (cmdContext *CmdContext) CallDefineFlag(repoId, flagName, desc,
 		[]string{"Log", "RepoId", "Name", "Description"},
 		[]string{cmdContext.TestDemarcation(), repoId, flagName, desc},
 		imageFilePath)
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil}
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	cmdContext.AssertErrIsNil(err, "")
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	return responseMap, nil
 }
@@ -1573,21 +1565,13 @@ func (cmdContext *CmdContext) CallGetScanConfigDesc(scanConfigId string,
 		"getScanConfigDesc",
 		[]string{"Log", "ScanConfigId"},
 		[]string{cmdContext.TestDemarcation(), scanConfigId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if expectToFindIt {
-		if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
-	} else {
-		if resp.StatusCode == 200 {
-			cmdContext.FailTest()
-		} else {
-		}	
-		return nil
-	}
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	cmdContext.AssertErrIsNil(err, "")
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1604,13 +1588,13 @@ func (cmdContext *CmdContext) CallChangePassword(userId, oldPswd, newPswd string
 		"changePassword",
 		[]string{"Log", "UserId", "OldPassword", "NewPassword"},
 		[]string{cmdContext.TestDemarcation(), userId, oldPswd, newPswd})
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	cmdContext.AssertErrIsNil(err, "")
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	return responseMap, nil
 }
@@ -1628,21 +1612,13 @@ func (cmdContext *CmdContext) CallGetFlagDesc(flagId string, expectToFindIt bool
 		"getFlagDesc",
 		[]string{"Log", "FlagId"},
 		[]string{cmdContext.TestDemarcation(), flagId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return ""}
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if expectToFindIt {
-		if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
-	} else {
-		if resp.StatusCode == 200 {
-			cmdContext.FailTest()
-		} else {
-		}	
-		return ""
-	}
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return "" }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1659,19 +1635,19 @@ func (cmdContext *CmdContext) CallGetFlagImage(flagId string, filename string) (
 		"getFlagImage",
 		[]string{"Log", "FlagId"},
 		[]string{cmdContext.TestDemarcation(), flagId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return 0 }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var reader io.ReadCloser = resp.Body
 	var file *os.File
 	file, err = os.Create(filename)
-	cmdContext.AssertErrIsNil(err, "")
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	_, err = io.Copy(file, reader)
-	cmdContext.AssertErrIsNil(err, "")
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	var fileInfo os.FileInfo
 	fileInfo, err = file.Stat()
-	if ! cmdContext.AssertErrIsNil(err, "") { return 0 }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	cmdContext.AssertThat(fileInfo.Size() > 0, "File has zero size")
 	fmt.Println("Downloaded flag graphic image " + filename)
 	
@@ -1691,9 +1667,9 @@ func (cmdContext *CmdContext) CallGetMyScanConfigs() ([]map[string]interface{}, 
 		"getMyScanConfigs",
 		[]string{"Log"},
 		[]string{cmdContext.TestDemarcation()})
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil, nil }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
@@ -1714,13 +1690,13 @@ func (cmdContext *CmdContext) CallGetScanConfigDescByName(repoId, scanConfigName
 		"getScanConfigDescByName",
 		[]string{"Log", "RepoId", "ScanConfigName"},
 		[]string{cmdContext.TestDemarcation(), repoId, scanConfigName})
-	if ! cmdContext.AssertErrIsNil(err, "") { return "" }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return "" }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1737,16 +1713,15 @@ func (cmdContext *CmdContext) CallRemScanConfig(scanConfigId string) (map[string
 		"remScanConfig",
 		[]string{"Log", "ScanConfigId"},
 		[]string{cmdContext.TestDemarcation(), scanConfigId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) {
-		cmdContext.FailTest()
-		return false
+		return nil, errors.New(resp.Status)
 	}
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 
 	return responseMap, nil
 }
@@ -1764,13 +1739,13 @@ func (cmdContext *CmdContext) CallGetMyFlags() ([]map[string]interface{}, error)
 		"getMyFlags",
 		[]string{"Log"},
 		[]string{cmdContext.TestDemarcation()})
-	if ! cmdContext.AssertErrIsNil(err, "while performing SendSessionPost") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "while performing SendSessionPost") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	return responseMaps, nil
 }
 
@@ -1787,13 +1762,13 @@ func (cmdContext *CmdContext) CallGetFlagDescByName(repoId, flagName string) (ma
 		"getFlagDescByName",
 		[]string{"Log", "RepoId", "FlagName"},
 		[]string{cmdContext.TestDemarcation(), repoId, flagName})
-	if err != nil { fmt.Println(err.Error()); return "" }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return "" }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1810,13 +1785,13 @@ func (cmdContext *CmdContext) CallRemFlag(flagId string) (map[string]interface{}
 		"remFlag",
 		[]string{"Log", "FlagId"},
 		[]string{cmdContext.TestDemarcation(), flagId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1833,13 +1808,13 @@ func (cmdContext *CmdContext) CallRemDockerImage(imageId string) (map[string]int
 		"remDockerImage",
 		[]string{"Log", "ImageId"},
 		[]string{cmdContext.TestDemarcation(), imageId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1856,12 +1831,12 @@ func (cmdContext *CmdContext) CallRemImageVersion(imageVersionId string) (map[st
 		"remImageVersion",
 		[]string{"Log", "ImageVersionId"},
 		[]string{cmdContext.TestDemarcation(), imageVersionId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return false}
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "") { return false }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1878,16 +1853,15 @@ func (cmdContext *CmdContext) CallGetDockerImageVersions(imageId string) ([]map[
 		"getDockerImageVersions",
 		[]string{"Log", "DockerImageId"},
 		[]string{cmdContext.TestDemarcation(), imageId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return nil}
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	if ! cmdContext.Verify200Response(resp) {
-		cmdContext.FailTest()
-		return nil
+		return nil, errors.New(resp.Status)
 	}
 
 	var responseMaps []map[string]interface{}
 	responseMaps, err = rest.ParseResponseBodyToPayloadMaps(resp.Body)
-	if err != nil { fmt.Println(err.Error()); return nil }
+	if err != nil { fmt.Println(err.Error()); return nil, err }
 
 	return responseMaps, nil
 }
@@ -1906,7 +1880,7 @@ func (cmdContext *CmdContext) CallUpdateUserInfo(userId, userName,
 		"updateUserInfo",
 		[]string{"Log", "UserId", "UserName", "EmailAddress"},
 		[]string{cmdContext.TestDemarcation(), userId, userName, email})
-	if ! cmdContext.AssertErrIsNil(err, "when calling updateUserInfo") { return }
+	if ! cmdContext.AssertErrIsNil(err, "when calling updateUserInfo") { return nil, err }
 	
 	var responseMap map[string]interface{}
 	cmdContext.Verify200Response(resp)
@@ -1926,11 +1900,11 @@ func (cmdContext *CmdContext) CallUserExists(userId string) (map[string]interfac
 		"userExists",
 		[]string{"Log", "UserId"},
 		[]string{cmdContext.TestDemarcation(), userId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	var responseMap map[string]interface{}
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
 	
 	return responseMap, nil
@@ -1950,9 +1924,9 @@ func (cmdContext *CmdContext) CallUseScanConfigForImage(dockerImageId,
 		"useScanConfigForImage",
 		[]string{"Log", "DockerImageId", "ScanConfigId"},
 		[]string{cmdContext.TestDemarcation(), dockerImageId, scanConfigId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	return responseMap, nil
 }
 
@@ -1970,12 +1944,12 @@ func (cmdContext *CmdContext) CallStopUsingScanConfigForImage(dockerImageId,
 		"stopUsingScanConfigForImage",
 		[]string{"Log", "DockerImageId", "ScanConfigId"},
 		[]string{cmdContext.TestDemarcation(), dockerImageId, scanConfigId})
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil, err }
 	return responseMap, nil
 }
 
@@ -1999,12 +1973,12 @@ func (cmdContext *CmdContext) CallEnableEmailVerification(enabled bool) (map[str
 		"enableEmailVerification",
 		[]string{"Log", "VerificationEnabled"},
 		[]string{cmdContext.TestDemarcation(), flag})
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil, err }
 	return responseMap, nil
 }
 
@@ -2021,12 +1995,12 @@ func (cmdContext *CmdContext) CallValidateAccountVerificationToken(token string)
 		"validateAccountVerificationToken",
 		[]string{"Log", "AccountVerificationToken"},
 		[]string{cmdContext.TestDemarcation(), token})
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
 	var responseMap map[string]interface{}
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil, err }
 	
 	return responseMap, nil
 }
@@ -2044,11 +2018,11 @@ func (cmdContext *CmdContext) CallClearAll() (map[string]interface{}, error) {
 		"clearAll",
 		[]string{"Log"},
 		[]string{cmdContext.TestDemarcation()})
-	if ! cmdContext.AssertErrIsNil(err, "") { return }
+	if ! cmdContext.AssertErrIsNil(err, "") { return nil, err }
 	
-	if ! cmdContext.Verify200Response(resp) { cmdContext.FailTest() }
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
 	var responseMap map[string]interface{}
 	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
-	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil }
+	if ! cmdContext.AssertErrIsNil(err, "while parsing response body to map") { return nil, err }
 	return responseMap, nil
 }

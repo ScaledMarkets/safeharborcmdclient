@@ -60,54 +60,100 @@ func main() {
 	
 	var args []string = flag.Args()
 	if len(args) == 0 {
-		....
+		usage()
+		os.Exit(2)
 	}
+	
+	// Obtain the command name and its arguments.
 	var command = args[0]
-	var restArgs []string = make([]string, len(args))
-	restArgs[0] = "Log"
+	var commandArgs []string = make([]string, len(args)-1)
+	commandArgs[0] = "Log"
 	for i, ra := range args {
 		if i > 0 {
-			restArgs[i] = ra
+			commandArgs[i] = ra
 		}
 	}
 	
-	// Prepare context.
+	// Create the object on which to make the method call.
 	var cmdContext = &CmdContext{
 		RestContext: utils.NewRestContext(*scheme, *hostname, *port, utils.SetSessionId,
 			*stopOnFirstError, *redisPswd, *nolargefiles)
 	}
 	cmdContext.Print()
 	
-	// Call the command - a method of CommandContext - using reflection.
+	// Identify the method of CommandContext, using reflection.
 	var method = reflect.ValueOf(cmdContext).MethodByName(command)
-	if err != nil { ....error }
-	if ! method.IsValid() { ...."Method " + command + " is unknown") }
-	var v = reflect.ValueOf(....)
-	var inVals = make([]reflect.Value, len(restArgs))
-	for i, arg := range restArgs {
+	if err != nil {
+		fmt.Println("Method unknown: " + command + "; " + err.Error())
+		os.Exit(2)
+	}
+	if ! method.IsValid() {
+		fmt.Println("Method invalid: " + command + "; " + err.Error())
+		os.Exit(2)
+	}
+	
+	// Prepare the method parameter values for the method call. These are the
+	// command line arguments.
+	var inVals = make([]reflect.Value, len(commandArgs))
+	for i, arg := range commandArgs {
 		inVals[i] = reflect.ValueOf(arg)
 	}
+	
+	// Perform the method call.
+	// All methods return a pair of objects of one of these sets of object types:
+	//	map[string]interface{}, error
+	//	[]map[string]interface{}, error
+	//	int64, error - when a file is downloaded
 	var results []reflect.Value = v.Call(inVals)
 	if len(results) != 2 {
-		....
+		fmt.Println(fmt.Sprintf(
+			"%d return value(s) when calling %s: expected two", len(results), command))
+		os.Exit(2)
 	}
 	
 	var err error
-	if results[1].IsNil() {
-		var isType bool
-		err, isType = results[1].(error)
-		if ! isType ....error - unexpected type
-	} else {
-		if results[0].IsNil() {
-			....error - no result
-		} else {
-			var j []byte
-			j, err = json.Marshall(results[0])
-			if err != nil {
-				....
-			} else {
-				fmt.Println(string(j))
+	if results[1].IsNil() { // no error was returned
+		if results[0].IsNil() {  // error - no result was returned
+			
+		} else { // ok - there was a result, and no error was returned
+			
+			// Determine result type.
+			switch result := results[0].(type) {
+				case map[string]interface{}, []map[string]interface{}:
+					// Convert the result to JSON and print it.
+					var jb []byte
+					jb, err = json.Marshall(result)
+					if err != nil { // error unmarshalling result
+						fmt.Println("Error unmarshalling result: " + err.Error())
+						os.Exit(2)
+					} else {
+						fmt.Println(string(jb))  // Print the result.
+					}
+					
+				case int64: {
+					fmt.Println(fmt.Sprintf("%d bytes downloaded", result))
+				}
+				default: {
+					fmt.Println(fmt.Sprintf(
+						"Unexpected return object of type %T", result))
+					os.Exit(2)
+				}
 			}
 		}
+	} else { // an error was returned
+		var isType bool
+		err, isType = results[1].(error)
+		if ! isType { // error - unexpected type
+			fmt.Println("Second return object is not nil but is not an error object")
+			os.Exit(2)
+		} else { // a valid error object was returned
+			fmt.Println("Error: " + err.Error())
+			os.Exit(1)
+		}
 	}
+}
+
+func usage() {
+	fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
+	flag.PrintDefaults()
 }
