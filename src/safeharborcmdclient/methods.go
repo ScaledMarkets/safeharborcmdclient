@@ -137,7 +137,7 @@ func (cmdContext *CmdContext) CallGetDockerfileDesc(dockerfileId string) (map[st
 }
 
 /*******************************************************************************
- * Verify that we can create a new realm.
+ * 
  */
 func (cmdContext *CmdContext) CallCreateRealm(realmName, orgFullName,
 	desc string) (map[string]interface{}, error) {
@@ -162,7 +162,7 @@ func (cmdContext *CmdContext) CallCreateRealm(realmName, orgFullName,
 }
 
 /*******************************************************************************
- * Verify that we can look up a realm by its name.
+ * 
  */
 func (cmdContext *CmdContext) TestGetRealmByName(realmName string) (map[string]interface{}, error) {
 	
@@ -195,7 +195,7 @@ func (cmdContext *CmdContext) TestGetRealmByName(realmName string) (map[string]i
 }
 
 /*******************************************************************************
- * Return the object Id of the new user.
+ * 
  */
 func (cmdContext *CmdContext) CallCreateUser(userId string, userName string,
 	email string, pswd string, realmId string) (map[string]interface{}, error) {
@@ -220,7 +220,7 @@ func (cmdContext *CmdContext) CallCreateUser(userId string, userName string,
 }
 
 /*******************************************************************************
- * Returns session Id, and isAdmin.
+ * 
  */
 func (cmdContext *CmdContext) CallAuthenticate(userId string, pswd string) (map[string]interface{}, error) {
 	
@@ -245,7 +245,7 @@ func (cmdContext *CmdContext) CallAuthenticate(userId string, pswd string) (map[
 }
 
 /*******************************************************************************
- * Return true if successful.
+ * 
  */
 func (cmdContext *CmdContext) CallDisableUser(userObjId string) (map[string]interface{}, error) {
 	
@@ -316,8 +316,7 @@ func (cmdContext *CmdContext) CallLogout() (map[string]interface{}, error) {
 }
 
 /*******************************************************************************
- * Verify that we can create a new repo. This requires that we first created
- * a realm that the repo can belong to.
+ * 
  */
 func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
 	desc string, optDockerfilePath string) (map[string]interface{}, error) {
@@ -357,9 +356,7 @@ func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
 }
 
 /*******************************************************************************
- * Verify that we can upload a dockerfile. This requries that we first created
- * a repo to uplaod it into. Returns the Id of the dockerfile, and a map of the
- * fields of the DockerfileDesc.
+ * 
  */
 func (cmdContext *CmdContext) CallAddDockerfile(repoId string, dockerfilePath string,
 	desc string) (map[string]interface{}, error) {
@@ -387,8 +384,7 @@ func (cmdContext *CmdContext) CallAddDockerfile(repoId string, dockerfilePath st
 }
 
 /*******************************************************************************
- * Verify that we can obtain the names of the dockerfiles owned by the specified
- * repo. The result is an array of dockerfile names.
+ * 
  */
 func (cmdContext *CmdContext) CallGetDockerfiles(repoId string) ([]map[string]interface{}, error) {
 	
@@ -412,9 +408,7 @@ func (cmdContext *CmdContext) CallGetDockerfiles(repoId string) ([]map[string]in
 }
 
 /*******************************************************************************
- * Verify that we can build an image, from a dockerfile that has already been
- * uploaded into a repo and for which we have the SafeHarborServer image id.
- * The result is the object Id of the image version, and the image.
+ * 
  */
 func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId string,
 	imageName string, paramNames, paramValues []string) (map[string]interface{}, error) {
@@ -463,9 +457,7 @@ func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId str
 }
 
 /*******************************************************************************
- * Verify that we can upload a dockerfile and build an image from it.
- * The result is the object Id of the image version, and the image,
- * and the object Id of the event pertaining to the creation of the image.
+ * 
  */
 func (cmdContext *CmdContext) CallAddAndExecDockerfile(repoId string, desc string,
 	imageName string, dockerfilePath string, paramNames, paramValues []string) (map[string]interface{}, error) {
@@ -528,7 +520,7 @@ func (cmdContext *CmdContext) CallGetEventDesc(eventId string) (map[string]inter
 }
 
 /*******************************************************************************
- * Result is an array of the names of the images owned by the specified repo.
+ * 
  */
 func (cmdContext *CmdContext) CallGetDockerImages(repoId string) ([]map[string]interface{}, error) {
 	
@@ -555,8 +547,7 @@ func (cmdContext *CmdContext) CallGetDockerImages(repoId string) ([]map[string]i
 }
 
 /*******************************************************************************
- * Return the object Id of the specified user, and a list of the realms that
- * the user can modify.
+ * 
  */
 func (cmdContext *CmdContext) CallGetUserDesc(userId string) (map[string]interface{}, error) {
 	
@@ -611,7 +602,7 @@ func (cmdContext *CmdContext) CallCreateGroup(realmId, name, description string,
 }
 
 /*******************************************************************************
- * Return an array of the user object ids.
+ * 
  */
 func (cmdContext *CmdContext) CallGetGroupUsers(groupId string) (map[string]interface{}, error) {
 	
@@ -662,7 +653,7 @@ func (cmdContext *CmdContext) CallAddGroupUser(groupId, userId string) (map[stri
 }
 
 /*******************************************************************************
- * Returns result.
+ * 
  */
 func (cmdContext *CmdContext) CallMoveUserToRealm(userObjId, realmId string) (map[string]interface{}, error) {
 	
@@ -764,7 +755,7 @@ func (cmdContext *CmdContext) CallGetAllRealms() ([]map[string]interface{}, erro
 }
 
 /*******************************************************************************
- * Returns the Ids of the dockerfiles.
+ * 
  */
 func (cmdContext *CmdContext) CallGetMyDockerfiles() ([]map[string]interface{}, error) {
 	
@@ -788,7 +779,7 @@ func (cmdContext *CmdContext) CallGetMyDockerfiles() ([]map[string]interface{}, 
 }
 
 /*******************************************************************************
- * Returns the Ids of the image objects.
+ * 
  */
 func (cmdContext *CmdContext) CallGetMyDockerImages() ([]map[string]interface{}, error) {
 	
@@ -812,7 +803,7 @@ func (cmdContext *CmdContext) CallGetMyDockerImages() ([]map[string]interface{},
 }
 
 /*******************************************************************************
- * Returns the obj Ids of the realm''s users.
+ * 
  */
 func (cmdContext *CmdContext) CallGetRealmUsers(realmId string) ([]map[string]interface{}, error) {
 	
@@ -836,7 +827,7 @@ func (cmdContext *CmdContext) CallGetRealmUsers(realmId string) ([]map[string]in
 }
 
 /*******************************************************************************
- * Returns the (Id, Id) of the created realm and user, respectively
+ * 
  */
 func (cmdContext *CmdContext) CallCreateRealmAnon(realmName, orgFullName, adminUserId,
 	adminUserFullName, adminEmailAddr, adminPassword string) (map[string]interface{}, error) {
@@ -895,7 +886,7 @@ func (cmdContext *CmdContext) CallGetRealmByName(realmName string) (map[string]i
 }
 
 /*******************************************************************************
- * Returns the permissions that resulted.
+ * 
  */
 func (cmdContext *CmdContext) CallSetPermission(partyId, resourceId string,
 	permissions []bool) (map[string]interface{}, error) {
@@ -922,7 +913,7 @@ func (cmdContext *CmdContext) CallSetPermission(partyId, resourceId string,
 }
 
 /*******************************************************************************
- * Returns the permissions that resulted.
+ * 
  */
 func (cmdContext *CmdContext) CallAddPermission(partyId, resourceId string,
 	permissions []bool) (map[string]interface{}, error) {
@@ -949,7 +940,7 @@ func (cmdContext *CmdContext) CallAddPermission(partyId, resourceId string,
 }
 
 /*******************************************************************************
- * Return an array of string representing the values for the permission mask.
+ * 
  */
 func (cmdContext *CmdContext) CallGetPermission(partyId, resourceId string) (map[string]interface{}, error) {
 
@@ -973,7 +964,7 @@ func (cmdContext *CmdContext) CallGetPermission(partyId, resourceId string) (map
 }
 
 /*******************************************************************************
- * Return an array of the names of the available providers.
+ * 
  */
 func (cmdContext *CmdContext) CallGetScanProviders() ([]map[string]interface{}, error) {
 	
@@ -997,7 +988,7 @@ func (cmdContext *CmdContext) CallGetScanProviders() ([]map[string]interface{}, 
 }
 
 /*******************************************************************************
- * Returns the Id of the ScanConfig that gets created.
+ * 
  */
 func (cmdContext *CmdContext) CallDefineScanConfig(name, desc, repoId, providerName,
 	successExpr, successGraphicFilePath string, providerParamNames []string,
@@ -1074,7 +1065,7 @@ func (cmdContext *CmdContext) CallUpdateScanConfig(scanConfigId, name, desc, pro
 }
 
 /*******************************************************************************
- * Returns array of maps, each containing the fields of a ScanEventDesc.
+ * 
  */
 func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[string]interface{}, error) {
 	
@@ -1119,7 +1110,7 @@ func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[
 }
 
 /*******************************************************************************
- * Return the object Id of the current authenticated user.
+ * 
  */
 func (cmdContext *CmdContext) CallGetMyDesc() (map[string]interface{}, error) {
 	
@@ -1444,7 +1435,7 @@ func (cmdContext *CmdContext) CallGetUserEvents(userId string) ([]map[string]int
 }
 
 /*******************************************************************************
- * Returns array of event Ids.
+ * 
  */
 func (cmdContext *CmdContext) CallGetDockerImageEvents(imageObjId string) ([]map[string]interface{}, error) {
 	
@@ -1600,7 +1591,7 @@ func (cmdContext *CmdContext) CallChangePassword(userId, oldPswd, newPswd string
 }
 
 /*******************************************************************************
- * Returns the name of the flag.
+ * 
  */
 func (cmdContext *CmdContext) CallGetFlagDesc(flagId string, expectToFindIt bool) (map[string]interface{}, error) {
 	
@@ -1623,7 +1614,7 @@ func (cmdContext *CmdContext) CallGetFlagDesc(flagId string, expectToFindIt bool
 }
 
 /*******************************************************************************
- * Returns the size of the file that was downloaded.
+ * 
  */
 func (cmdContext *CmdContext) CallGetFlagImage(flagId string, filename string) (int64, error) {
 	
@@ -1841,7 +1832,7 @@ func (cmdContext *CmdContext) CallRemImageVersion(imageVersionId string) (map[st
 }
 
 /*******************************************************************************
- * Return an array of maps, each containing the fields on a DockerImageVersionDesc.
+ * 
  */
 func (cmdContext *CmdContext) CallGetDockerImageVersions(imageId string) ([]map[string]interface{}, error) {
 	

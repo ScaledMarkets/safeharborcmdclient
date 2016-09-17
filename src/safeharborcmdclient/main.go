@@ -156,4 +156,18 @@ func main() {
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
 	flag.PrintDefaults()
+	
+	fmt.Println("\tCommands:")
+	for m := 1; m <= v.NumMethod(); m++ {
+		var meth Value = v.Method(m-1)
+		var methodType = meth.Type()
+		fmt.Print("\t\t" + methodType.Name())
+		var numArgs = methodType.NumIn()
+		for a := 1; a <= numArgs; a++ {
+			var argType Type = methodType.In(a-1)
+			fmt.Print(" " + argType.Name())
+		}
+		fmt.Println()
+	}
+	
 }
