@@ -15,12 +15,12 @@ The options are,
 ```
 For example,
 ```
-  safeharborcmdclient -h 123.456.234.567 -p 6000 ping
+  safeharborcmdclient -h 123.456.234.567 -p 6000 Ping
 ```
-calls the SafeHarbor ping REST function on the server at 123.456.234.567:6000.
+calls the SafeHarbor Ping REST function on the server at 123.456.234.567:6000.
 As another example,
 ```
-  safeharborcmdclient -h 123.456.234.567 -p 6000 getGroupDesc 6789
+  safeharborcmdclient -h 123.456.234.567 -p 6000 GetGroupDesc 6789
 ```
-calls the getGroupDesc SafeHarbor REST function, supplying 6789 for the requried Groupid parameter.
+calls the GetGroupDesc SafeHarbor REST function, supplying 6789 for the requried Groupid parameter.
 The result that is returned is always a JSON structure containing the result, or an error.
