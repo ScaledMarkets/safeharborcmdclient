@@ -25,11 +25,16 @@ all: compile
 $(build_dir):
 	mkdir $(build_dir)
 
-$(build_dir)/$(EXECNAME): $(build_dir) $(src_dir)
+$(build_dir)/$(EXECNAME): $(build_dir) $(src_dir)/$(PACKAGENAME)/*.go
 
 # 'make compile' builds the executable, which is placed in <build_dir>.
-compile: $(build_dir)/$(PACKAGENAME)
-
-$(build_dir)/$(PACKAGENAME): $(build_dir)
+compile: $(build_dir) $(src_dir)/$(PACKAGENAME)/*.go
 	@echo "UTILITIESDIR=$(UTILITIESDIR)"
 	@GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME)
+
+$(pkg_dir)/$(CPU_ARCH)/$(PACKAGENAME)/*.a : compile
+
+$(build_dir)/$(PACKAGENAME): compile
+
+clean:
+	rm $(build_dir)/*

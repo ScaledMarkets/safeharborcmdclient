@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Access a SafeHarbor server from a command line.
  * Syntax:
- *	safeharbor [-option]* command [arg]*
+ *	safeharborcmdclient [-option]* command [arg]*
  * The commands is simply the name of the REST function, with arguments according
  * to that REST function. If a REST function has a file argument, the command line
  * takes a file path for that argument.
@@ -14,17 +14,10 @@ package main
 import (
 	"fmt"
 	"net/http"
-	//"net/url"
 	"os"
 	"flag"
-	//"time"
-	//"strings"
 	"reflect"
-	//"strconv"
 	"encoding/json"
-	
-	// SafeHarbor packages:
-	//"utilities/rest"
 )
 
 const (
@@ -38,7 +31,7 @@ func main() {
 	var hostname *string = flag.String("h", "localhost", "Internet address of server.")
 	var port *int = flag.Int("p", 80, "Port server is on.")
 	var userId *string = flag.String("u", "", "User Id for accessing the Safe Harbor server")
-	var password *string = flag.String("s", "", "Password for accessing the Safe Harbor server")
+	var password *string = flag.String("w", "", "Password for accessing the Safe Harbor server")
 	
 	flag.Parse()
 
@@ -64,17 +57,18 @@ func main() {
 	
 	// Obtain the command name and its arguments.
 	var command = args[0]
+	fmt.Println(fmt.Sprintf("args has len %d", len(args)))  // debug
 	var commandArgs []string = make([]string, len(args)-1)
-	commandArgs[0] = "Log"
 	for i, ra := range args {
 		if i > 0 {
-			commandArgs[i] = ra
+			commandArgs[i-1] = ra
+			fmt.Println(fmt.Sprintf("commandArgs[%d]=%s", (i-1), ra))  // debug
 		}
 	}
 	
 	// Identify the method of CommandContext, using reflection.
 	var method = reflect.ValueOf(cmdContext).MethodByName(command)
-	if method.IsNil() {
+	if (! method.IsValid()) || method.IsNil() {
 		fmt.Println("Method unknown: " + command)
 		os.Exit(2)
 	}
@@ -93,32 +87,41 @@ func main() {
 	// Authenticate to server - this returns a SessionId.
 	var restResponse map[string]interface{}
 	var err error
-	restResponse, err = cmdContext.CallAuthenticate(*userId, *password)
-	if err != nil {
-		fmt.Println("Authentication with server failed: " + err.Error())
-		os.Exit(2)
+	if *userId != "" {
+		restResponse, err = cmdContext.Authenticate(*userId, *password)
+		if err != nil {
+			fmt.Println("Authentication with server failed: " + err.Error())
+			os.Exit(2)
+		}
+	
+		var obj = restResponse["UniqueSessionId"]
+		if obj == nil {
+			fmt.Println("Error: UniqueSessionId not found in response from server")
+			os.Exit(2)
+		}
+		var sessionId string
+		var isType bool
+		sessionId, isType = obj.(string)
+		if ! isType {
+			fmt.Println("Error: UniqueSessionId is not a string")
+			os.Exit(2)
+		}
+		cmdContext.SetSessionId(sessionId)
 	}
 	
-	var obj = restResponse["UniqueSessionId"]
-	if obj == nil {
-		fmt.Println("Error: UniqueSessionId not found in response from server")
+	// Identify the method to be called.
+	var meth reflect.Value = cmdContextValue.MethodByName(command)
+	if (! meth.IsValid()) || meth.IsNil() {
+		fmt.Println("Method '" + command + "' not found")
 		os.Exit(2)
 	}
-	var sessionId string
-	var isType bool
-	sessionId, isType = obj.(string)
-	if ! isType {
-		fmt.Println("Error: UniqueSessionId is not a string")
-		os.Exit(2)
-	}
-	cmdContext.SetSessionId(sessionId)
-	
+
 	// Perform the method call.
 	// All methods return a pair of objects of one of these sets of object types:
 	//	map[string]interface{}, error
 	//	[]map[string]interface{}, error
 	//	int64, error - when a file is downloaded
-	var results []reflect.Value = cmdContextValue.Call(inVals)
+	var results []reflect.Value = meth.Call(inVals)
 	if len(results) != 2 {
 		fmt.Println(fmt.Sprintf(
 			"%d return value(s) when calling %s: expected two", len(results), command))
@@ -131,8 +134,7 @@ func main() {
 		} else { // ok - there was a result, and no error was returned
 			
 			// Determine result type.
-			var iResult interface{} = results[0]
-			switch result := iResult.(type) {
+			switch result := results[0].Interface().(type) {
 				case map[string]interface{}, []map[string]interface{}:
 					// Convert the result to JSON and print it.
 					var jb []byte
@@ -168,6 +170,9 @@ func main() {
 	}
 }
 
+/*******************************************************************************
+ * 
+ */
 func SetSessionId(req *http.Request, sessionId string) {
 	
 	// Set cookie containing the session Id.
@@ -188,8 +193,11 @@ func SetSessionId(req *http.Request, sessionId string) {
 	req.AddCookie(cookie)
 }
 
+/*******************************************************************************
+ * 
+ */
 func usage(v reflect.Value) {
-	fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s [options] [arg]...\n", os.Args[0])
 	flag.PrintDefaults()
 	
 	fmt.Println("\tCommands:")
@@ -200,13 +208,16 @@ func usage(v reflect.Value) {
 		var numArgs = methodType.NumIn()
 		for a := 1; a <= numArgs; a++ {
 			var argType reflect.Type = methodType.In(a-1)
-			fmt.Print(" " + argType.Name())
+			fmt.Print(" <" + argType.Name() + ">")
 		}
 		fmt.Println()
 	}
 	
 }
 
+/*******************************************************************************
+ * 
+ */
 func BoolToString(b bool) string {
 	return fmt.Sprintf("%t", b)
 }

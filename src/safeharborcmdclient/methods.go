@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"os"
 	"io"
-	//"io/ioutil"
-	//"reflect"
 	"errors"
 	
 	"utilities/rest"
@@ -15,9 +13,33 @@ import (
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetGroupDesc(groupId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) Ping(groupId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetGroupDesc")
+	cmdContext.StartCall("Ping")
+	var resp *http.Response
+	var err error
+	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
+		"ping",
+		[]string{"Log"},
+		[]string{cmdContext.CallDemarcation()})
+	
+	defer resp.Body.Close()
+	if err != nil { fmt.Println(err.Error()); return nil, err }
+	
+	if ! cmdContext.Verify200Response(resp) { return nil, errors.New(resp.Status) }
+	var responseMap map[string]interface{}
+	responseMap, err = rest.ParseResponseBodyToMap(resp.Body)
+	if ! cmdContext.AssertErrIsNil(err, "at ParseResponseBodyToMap") { return nil, err }
+	
+	return responseMap, nil
+}
+
+/*******************************************************************************
+ * 
+ */
+func (cmdContext *CmdContext) GetGroupDesc(groupId string) (map[string]interface{}, error) {
+	
+	cmdContext.StartCall("GetGroupDesc")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
@@ -39,9 +61,9 @@ func (cmdContext *CmdContext) CallGetGroupDesc(groupId string) (map[string]inter
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetRepoDesc(repoId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetRepoDesc(repoId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetRepoDesc")
+	cmdContext.StartCall("GetRepoDesc")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
@@ -65,7 +87,7 @@ func (cmdContext *CmdContext) CallGetRepoDesc(repoId string) (map[string]interfa
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerImageDesc(dockerImageId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetDockerImageDesc(dockerImageId string) (map[string]interface{}, error) {
 	
 	cmdContext.StartCall("getDockerImageDesc")
 	var resp *http.Response
@@ -93,9 +115,9 @@ func (cmdContext *CmdContext) CallGetDockerImageDesc(dockerImageId string) (map[
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemDockerfile(dockerfileId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemDockerfile(dockerfileId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallRemDockerfile")
+	cmdContext.StartCall("RemDockerfile")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
@@ -117,7 +139,7 @@ func (cmdContext *CmdContext) CallRemDockerfile(dockerfileId string) (map[string
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerfileDesc(dockerfileId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetDockerfileDesc(dockerfileId string) (map[string]interface{}, error) {
 	
 	cmdContext.StartCall("getDockerfileDesc")
 	var resp *http.Response
@@ -142,10 +164,10 @@ func (cmdContext *CmdContext) CallGetDockerfileDesc(dockerfileId string) (map[st
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallCreateRealm(realmName, orgFullName,
+func (cmdContext *CmdContext) CreateRealm(realmName, orgFullName,
 	desc string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallCreateRealm")
+	cmdContext.StartCall("CreateRealm")
 	var resp *http.Response
 	var err error
 	resp, err = cmdContext.SendSessionPost(cmdContext.SessionId,
@@ -200,10 +222,10 @@ func (cmdContext *CmdContext) TestGetRealmByName(realmName string) (map[string]i
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallCreateUser(userId string, userName string,
+func (cmdContext *CmdContext) CreateUser(userId string, userName string,
 	email string, pswd string, realmId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallCreateUser")
+	cmdContext.StartCall("CreateUser")
 	
 	var resp *http.Response
 	var err error
@@ -226,9 +248,9 @@ func (cmdContext *CmdContext) CallCreateUser(userId string, userName string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallAuthenticate(userId string, pswd string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) Authenticate(userId string, pswd string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallAuthenticate")
+	cmdContext.StartCall("Authenticate")
 	
 	var resp *http.Response
 	var err error
@@ -251,9 +273,9 @@ func (cmdContext *CmdContext) CallAuthenticate(userId string, pswd string) (map[
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDisableUser(userObjId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) DisableUser(userObjId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallDisableUser")
+	cmdContext.StartCall("DisableUser")
 	
 	var resp *http.Response
 	var err error
@@ -276,9 +298,9 @@ func (cmdContext *CmdContext) CallDisableUser(userObjId string) (map[string]inte
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDeleteGroup(groupId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) DeleteGroup(groupId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallDeleteGroup")
+	cmdContext.StartCall("DeleteGroup")
 	
 	var resp *http.Response
 	var err error
@@ -301,9 +323,9 @@ func (cmdContext *CmdContext) CallDeleteGroup(groupId string) (map[string]interf
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallLogout() (map[string]interface{}, error) {
+func (cmdContext *CmdContext) Logout() (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallLogout")
+	cmdContext.StartCall("Logout")
 	
 	var resp *http.Response
 	var err error
@@ -326,10 +348,10 @@ func (cmdContext *CmdContext) CallLogout() (map[string]interface{}, error) {
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
+func (cmdContext *CmdContext) CreateRepo(realmId string, name string,
 	desc string, optDockerfilePath string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallCreateRepo")
+	cmdContext.StartCall("CreateRepo")
 	
 	var resp *http.Response
 	var err error
@@ -366,10 +388,10 @@ func (cmdContext *CmdContext) CallCreateRepo(realmId string, name string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallAddDockerfile(repoId string, dockerfilePath string,
+func (cmdContext *CmdContext) AddDockerfile(repoId string, dockerfilePath string,
 	desc string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallAddDockerfile")
+	cmdContext.StartCall("AddDockerfile")
 	fmt.Println("\t", dockerfilePath)
 	var resp *http.Response
 	var err error
@@ -394,9 +416,9 @@ func (cmdContext *CmdContext) CallAddDockerfile(repoId string, dockerfilePath st
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerfiles(repoId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetDockerfiles(repoId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetDockerfiles")
+	cmdContext.StartCall("GetDockerfiles")
 	
 	var resp *http.Response
 	var err error
@@ -419,10 +441,10 @@ func (cmdContext *CmdContext) CallGetDockerfiles(repoId string) ([]map[string]in
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId string,
+func (cmdContext *CmdContext) ExecDockerfile(repoId string, dockerfileId string,
 	imageName string, paramNames, paramValues []string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallExecDockerfile")
+	cmdContext.StartCall("ExecDockerfile")
 	
 	if len(paramNames) != len(paramValues) { panic(
 		"Invalid: len param names != len param values") }
@@ -466,10 +488,10 @@ func (cmdContext *CmdContext) CallExecDockerfile(repoId string, dockerfileId str
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallAddAndExecDockerfile(repoId string, desc string,
+func (cmdContext *CmdContext) AddAndExecDockerfile(repoId string, desc string,
 	imageName string, dockerfilePath string, paramNames, paramValues []string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallAddAndExecDockerfile")
+	cmdContext.StartCall("AddAndExecDockerfile")
 	
 	if len(paramNames) != len(paramValues) { panic(
 		"Invalid test: len param names != len param values") }
@@ -504,9 +526,9 @@ func (cmdContext *CmdContext) CallAddAndExecDockerfile(repoId string, desc strin
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetEventDesc(eventId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetEventDesc(eventId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetEventDesc")
+	cmdContext.StartCall("GetEventDesc")
 	
 	var resp *http.Response
 	var err error
@@ -528,9 +550,9 @@ func (cmdContext *CmdContext) CallGetEventDesc(eventId string) (map[string]inter
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerImages(repoId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetDockerImages(repoId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetDockerImages")
+	cmdContext.StartCall("GetDockerImages")
 	
 	var resp *http.Response
 	var err error
@@ -553,9 +575,9 @@ func (cmdContext *CmdContext) CallGetDockerImages(repoId string) ([]map[string]i
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetUserDesc(userId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetUserDesc(userId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetUserDesc")
+	cmdContext.StartCall("GetUserDesc")
 	
 	var resp *http.Response
 	var err error
@@ -578,10 +600,10 @@ func (cmdContext *CmdContext) CallGetUserDesc(userId string) (map[string]interfa
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallCreateGroup(realmId, name, description string,
+func (cmdContext *CmdContext) CreateGroup(realmId, name, description string,
 	addMe bool) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallCreateGroup")
+	cmdContext.StartCall("CreateGroup")
 	
 	var addMeStr = "false"
 	if addMe { addMeStr = "true" }
@@ -610,9 +632,9 @@ func (cmdContext *CmdContext) CallCreateGroup(realmId, name, description string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetGroupUsers(groupId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetGroupUsers(groupId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetGroupUsers")
+	cmdContext.StartCall("GetGroupUsers")
 
 	var resp *http.Response
 	var err error
@@ -636,9 +658,9 @@ func (cmdContext *CmdContext) CallGetGroupUsers(groupId string) ([]map[string]in
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallAddGroupUser(groupId, userId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) AddGroupUser(groupId, userId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallAddGroupUser")
+	cmdContext.StartCall("AddGroupUser")
 
 	var resp *http.Response
 	var err error
@@ -663,9 +685,9 @@ func (cmdContext *CmdContext) CallAddGroupUser(groupId, userId string) (map[stri
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallMoveUserToRealm(userObjId, realmId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) MoveUserToRealm(userObjId, realmId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallMoveUserToRealm")
+	cmdContext.StartCall("MoveUserToRealm")
 	
 	var resp *http.Response
 	var err error
@@ -688,9 +710,9 @@ func (cmdContext *CmdContext) CallMoveUserToRealm(userObjId, realmId string) (ma
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetRealmGroups(realmId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetRealmGroups(realmId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetRealmGroups")
+	cmdContext.StartCall("GetRealmGroups")
 
 	var resp *http.Response
 	var err error
@@ -716,10 +738,10 @@ func (cmdContext *CmdContext) CallGetRealmGroups(realmId string) ([]map[string]i
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetRealmRepos(realmId string) (
+func (cmdContext *CmdContext) GetRealmRepos(realmId string) (
 	[]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetRealmRepos")
+	cmdContext.StartCall("GetRealmRepos")
 	
 	var resp *http.Response
 	var err error
@@ -744,9 +766,9 @@ func (cmdContext *CmdContext) CallGetRealmRepos(realmId string) (
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetAllRealms() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetAllRealms() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetAllRealms")
+	cmdContext.StartCall("GetAllRealms")
 	
 	var resp *http.Response
 	var err error
@@ -769,9 +791,9 @@ func (cmdContext *CmdContext) CallGetAllRealms() ([]map[string]interface{}, erro
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyDockerfiles() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyDockerfiles() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyDockerfiles")
+	cmdContext.StartCall("GetMyDockerfiles")
 	
 	var resp *http.Response
 	var err error
@@ -794,9 +816,9 @@ func (cmdContext *CmdContext) CallGetMyDockerfiles() ([]map[string]interface{}, 
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyDockerImages() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyDockerImages() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyDockerImages")
+	cmdContext.StartCall("GetMyDockerImages")
 	
 	var resp *http.Response
 	var err error
@@ -819,9 +841,9 @@ func (cmdContext *CmdContext) CallGetMyDockerImages() ([]map[string]interface{},
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetRealmUsers(realmId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetRealmUsers(realmId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetRealmUsers")
+	cmdContext.StartCall("GetRealmUsers")
 	
 	var resp *http.Response
 	var err error
@@ -844,10 +866,10 @@ func (cmdContext *CmdContext) CallGetRealmUsers(realmId string) ([]map[string]in
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallCreateRealmAnon(realmName, orgFullName, adminUserId,
+func (cmdContext *CmdContext) CreateRealmAnon(realmName, orgFullName, adminUserId,
 	adminUserFullName, adminEmailAddr, adminPassword string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallCreateRealmAnon")
+	cmdContext.StartCall("CreateRealmAnon")
 	
 	var resp1 *http.Response
 	var err error
@@ -878,9 +900,9 @@ func (cmdContext *CmdContext) CallCreateRealmAnon(realmName, orgFullName, adminU
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetRealmByName(realmName string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetRealmByName(realmName string) (map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallGetRealmByName")
+	cmdContext.StartCall("GetRealmByName")
 	
 	var resp *http.Response
 	var err error
@@ -903,10 +925,10 @@ func (cmdContext *CmdContext) CallGetRealmByName(realmName string) (map[string]i
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallSetPermission(partyId, resourceId string,
+func (cmdContext *CmdContext) SetPermission(partyId, resourceId string,
 	permissions []bool) (map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallSetPermission")
+	cmdContext.StartCall("SetPermission")
 	
 	var resp *http.Response
 	var err error
@@ -931,10 +953,10 @@ func (cmdContext *CmdContext) CallSetPermission(partyId, resourceId string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallAddPermission(partyId, resourceId string,
+func (cmdContext *CmdContext) AddPermission(partyId, resourceId string,
 	permissions []bool) (map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallAddPermission")
+	cmdContext.StartCall("AddPermission")
 	
 	var resp *http.Response
 	var err error
@@ -959,9 +981,9 @@ func (cmdContext *CmdContext) CallAddPermission(partyId, resourceId string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetPermission(partyId, resourceId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetPermission(partyId, resourceId string) (map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallGetPermission")
+	cmdContext.StartCall("GetPermission")
 	
 	var resp *http.Response
 	var err error
@@ -984,9 +1006,9 @@ func (cmdContext *CmdContext) CallGetPermission(partyId, resourceId string) (map
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetScanProviders() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetScanProviders() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetScanProviders")
+	cmdContext.StartCall("GetScanProviders")
 	
 	var resp *http.Response
 	var err error
@@ -1009,11 +1031,11 @@ func (cmdContext *CmdContext) CallGetScanProviders() ([]map[string]interface{}, 
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDefineScanConfig(name, desc, repoId, providerName,
+func (cmdContext *CmdContext) DefineScanConfig(name, desc, repoId, providerName,
 	successExpr, successGraphicFilePath string, providerParamNames []string,
 	providerParamValues []string) (map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallDefineScanConfig")
+	cmdContext.StartCall("DefineScanConfig")
 	
 	var paramNames []string = []string{"Log", "Name", "Description", "RepoId", "ProviderName"}
 	var paramValues []string = []string{cmdContext.CallDemarcation(), name, desc, repoId, providerName}
@@ -1047,11 +1069,11 @@ func (cmdContext *CmdContext) CallDefineScanConfig(name, desc, repoId, providerN
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallUpdateScanConfig(scanConfigId, name, desc, providerName,
+func (cmdContext *CmdContext) UpdateScanConfig(scanConfigId, name, desc, providerName,
 	successExpr, successGraphicFilePath string, providerParamNames []string,
 	providerParamValues []string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallUpdateScanConfig")
+	cmdContext.StartCall("UpdateScanConfig")
 	
 	var paramNames []string = []string{"Log", "ScanConfigId", "Name", "Description", "ProviderName"}
 	var paramValues []string = []string{cmdContext.CallDemarcation(), scanConfigId, name, desc, providerName}
@@ -1077,9 +1099,9 @@ func (cmdContext *CmdContext) CallUpdateScanConfig(scanConfigId, name, desc, pro
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) ScanImage(scriptId, imageObjId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallScanImage")
+	cmdContext.StartCall("ScanImage")
 	
 	var resp *http.Response
 	var err error
@@ -1123,9 +1145,9 @@ func (cmdContext *CmdContext) CallScanImage(scriptId, imageObjId string) ([]map[
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyDesc() (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyDesc() (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyDesc")
+	cmdContext.StartCall("GetMyDesc")
 	
 	var resp *http.Response
 	var err error
@@ -1148,9 +1170,9 @@ func (cmdContext *CmdContext) CallGetMyDesc() (map[string]interface{}, error) {
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyGroups() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyGroups() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyGroups")
+	cmdContext.StartCall("GetMyGroups")
 	
 	var resp *http.Response
 	var err error
@@ -1173,9 +1195,9 @@ func (cmdContext *CmdContext) CallGetMyGroups() ([]map[string]interface{}, error
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyRealms() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyRealms() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyRealms")
+	cmdContext.StartCall("GetMyRealms")
 	
 	var resp *http.Response
 	var err error
@@ -1198,9 +1220,9 @@ func (cmdContext *CmdContext) CallGetMyRealms() ([]map[string]interface{}, error
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyRepos() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyRepos() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyRepos")
+	cmdContext.StartCall("GetMyRepos")
 	
 	var resp *http.Response
 	var err error
@@ -1223,10 +1245,10 @@ func (cmdContext *CmdContext) CallGetMyRepos() ([]map[string]interface{}, error)
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallReplaceDockerfile(dockerfileId, dockerfilePath,
+func (cmdContext *CmdContext) ReplaceDockerfile(dockerfileId, dockerfilePath,
 	desc string) (map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallReplaceDockerfile")
+	cmdContext.StartCall("ReplaceDockerfile")
 	
 	var resp *http.Response
 	var err error
@@ -1250,9 +1272,9 @@ func (cmdContext *CmdContext) CallReplaceDockerfile(dockerfileId, dockerfilePath
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDownloadImage(imageId, filename string) (int64, error) {
+func (cmdContext *CmdContext) DownloadImage(imageId, filename string) (int64, error) {
 
-	cmdContext.StartCall("CallDownloadImage")
+	cmdContext.StartCall("DownloadImage")
 	
 	var resp *http.Response
 	var err error
@@ -1285,9 +1307,9 @@ func (cmdContext *CmdContext) CallDownloadImage(imageId, filename string) (int64
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemGroupUser(groupId, userObjId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemGroupUser(groupId, userObjId string) (map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallRemGroupUser")
+	cmdContext.StartCall("RemGroupUser")
 	
 	var resp *http.Response
 	var err error
@@ -1309,9 +1331,9 @@ func (cmdContext *CmdContext) CallRemGroupUser(groupId, userObjId string) (map[s
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallReenableUser(userObjId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) ReenableUser(userObjId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallReenableUser")
+	cmdContext.StartCall("ReenableUser")
 	
 	var resp *http.Response
 	var err error
@@ -1333,9 +1355,9 @@ func (cmdContext *CmdContext) CallReenableUser(userObjId string) (map[string]int
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemRealmUser(realmId, userObjId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemRealmUser(realmId, userObjId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallRemRealmUser")
+	cmdContext.StartCall("RemRealmUser")
 	
 	var resp *http.Response
 	var err error
@@ -1357,9 +1379,9 @@ func (cmdContext *CmdContext) CallRemRealmUser(realmId, userObjId string) (map[s
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDeactivateRealm(realmId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) DeactivateRealm(realmId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallDeactivateRealm")
+	cmdContext.StartCall("DeactivateRealm")
 	
 	var resp *http.Response
 	var err error
@@ -1381,9 +1403,9 @@ func (cmdContext *CmdContext) CallDeactivateRealm(realmId string) (map[string]in
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDeleteRepo(repoId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) DeleteRepo(repoId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallDeleteRepo")
+	cmdContext.StartCall("DeleteRepo")
 	
 	var resp *http.Response
 	var err error
@@ -1405,9 +1427,9 @@ func (cmdContext *CmdContext) CallDeleteRepo(repoId string) (map[string]interfac
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemPermission(partyId, resourceId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemPermission(partyId, resourceId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallRemPermission")
+	cmdContext.StartCall("RemPermission")
 	
 	var resp *http.Response
 	var err error
@@ -1430,9 +1452,9 @@ func (cmdContext *CmdContext) CallRemPermission(partyId, resourceId string) (map
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetUserEvents(userId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetUserEvents(userId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetUserEvents")
+	cmdContext.StartCall("GetUserEvents")
 	
 	var resp *http.Response
 	var err error
@@ -1455,9 +1477,9 @@ func (cmdContext *CmdContext) CallGetUserEvents(userId string) ([]map[string]int
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerImageEvents(imageObjId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetDockerImageEvents(imageObjId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetDockerImageEvents")
+	cmdContext.StartCall("GetDockerImageEvents")
 	
 	var resp *http.Response
 	var err error
@@ -1480,9 +1502,9 @@ func (cmdContext *CmdContext) CallGetDockerImageEvents(imageObjId string) ([]map
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerImageStatus(imageObjId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetDockerImageStatus(imageObjId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetImageStatus")
+	cmdContext.StartCall("GetImageStatus")
 	
 	var resp *http.Response
 	var err error
@@ -1515,10 +1537,10 @@ func (cmdContext *CmdContext) CallGetDockerImageStatus(imageObjId string) (map[s
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerfileEvents(dockerfileId string,
+func (cmdContext *CmdContext) GetDockerfileEvents(dockerfileId string,
 	dockerfilePath string) ([]map[string]interface{}, error) {
 
-	cmdContext.StartCall("CallGetDockerfileEvents")
+	cmdContext.StartCall("GetDockerfileEvents")
 	
 	var resp *http.Response
 	var err error
@@ -1541,10 +1563,10 @@ func (cmdContext *CmdContext) CallGetDockerfileEvents(dockerfileId string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallDefineFlag(repoId, flagName, desc,
+func (cmdContext *CmdContext) DefineFlag(repoId, flagName, desc,
 	imageFilePath string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallDefineFlag")
+	cmdContext.StartCall("DefineFlag")
 	
 	var resp *http.Response
 	var err error
@@ -1567,10 +1589,10 @@ func (cmdContext *CmdContext) CallDefineFlag(repoId, flagName, desc,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetScanConfigDesc(scanConfigId string,
+func (cmdContext *CmdContext) GetScanConfigDesc(scanConfigId string,
 	expectToFindIt bool) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetScanConfigDesc")
+	cmdContext.StartCall("GetScanConfigDesc")
 	
 	var resp *http.Response
 	var err error
@@ -1592,9 +1614,9 @@ func (cmdContext *CmdContext) CallGetScanConfigDesc(scanConfigId string,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallChangePassword(userId, oldPswd, newPswd string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) ChangePassword(userId, oldPswd, newPswd string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallChangePassword")
+	cmdContext.StartCall("ChangePassword")
 	
 	var resp *http.Response
 	var err error
@@ -1617,9 +1639,9 @@ func (cmdContext *CmdContext) CallChangePassword(userId, oldPswd, newPswd string
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetFlagDesc(flagId string, expectToFindIt bool) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetFlagDesc(flagId string, expectToFindIt bool) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetFlagDesc")
+	cmdContext.StartCall("GetFlagDesc")
 	
 	var resp *http.Response
 	var err error
@@ -1641,9 +1663,9 @@ func (cmdContext *CmdContext) CallGetFlagDesc(flagId string, expectToFindIt bool
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetFlagImage(flagId string, filename string) (int64, error) {
+func (cmdContext *CmdContext) GetFlagImage(flagId string, filename string) (int64, error) {
 	
-	cmdContext.StartCall("CallGetFlagImage")
+	cmdContext.StartCall("GetFlagImage")
 	
 	var resp *http.Response
 	var err error
@@ -1674,9 +1696,9 @@ func (cmdContext *CmdContext) CallGetFlagImage(flagId string, filename string) (
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyScanConfigs() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyScanConfigs() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyScanConfigs")
+	cmdContext.StartCall("GetMyScanConfigs")
 	
 	var resp *http.Response
 	var err error
@@ -1698,9 +1720,9 @@ func (cmdContext *CmdContext) CallGetMyScanConfigs() ([]map[string]interface{}, 
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetScanConfigDescByName(repoId, scanConfigName string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetScanConfigDescByName(repoId, scanConfigName string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetScanConfigDescByName")
+	cmdContext.StartCall("GetScanConfigDescByName")
 	
 	var resp *http.Response
 	var err error
@@ -1722,9 +1744,9 @@ func (cmdContext *CmdContext) CallGetScanConfigDescByName(repoId, scanConfigName
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemScanConfig(scanConfigId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemScanConfig(scanConfigId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallRemScanConfig")
+	cmdContext.StartCall("RemScanConfig")
 	
 	var resp *http.Response
 	var err error
@@ -1749,9 +1771,9 @@ func (cmdContext *CmdContext) CallRemScanConfig(scanConfigId string) (map[string
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetMyFlags() ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetMyFlags() ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetMyFlags")
+	cmdContext.StartCall("GetMyFlags")
 	
 	var resp *http.Response
 	var err error
@@ -1773,9 +1795,9 @@ func (cmdContext *CmdContext) CallGetMyFlags() ([]map[string]interface{}, error)
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetFlagDescByName(repoId, flagName string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetFlagDescByName(repoId, flagName string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetFlagDescByName")
+	cmdContext.StartCall("GetFlagDescByName")
 	
 	var resp *http.Response
 	var err error
@@ -1797,9 +1819,9 @@ func (cmdContext *CmdContext) CallGetFlagDescByName(repoId, flagName string) (ma
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemFlag(flagId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemFlag(flagId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallRemFlag")
+	cmdContext.StartCall("RemFlag")
 	
 	var resp *http.Response
 	var err error
@@ -1821,9 +1843,9 @@ func (cmdContext *CmdContext) CallRemFlag(flagId string) (map[string]interface{}
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemDockerImage(imageId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemDockerImage(imageId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallRemDockerImage")
+	cmdContext.StartCall("RemDockerImage")
 	
 	var resp *http.Response
 	var err error
@@ -1845,9 +1867,9 @@ func (cmdContext *CmdContext) CallRemDockerImage(imageId string) (map[string]int
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallRemImageVersion(imageVersionId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) RemImageVersion(imageVersionId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallRemImageVersion")
+	cmdContext.StartCall("RemImageVersion")
 
 	var resp *http.Response
 	var err error
@@ -1868,9 +1890,9 @@ func (cmdContext *CmdContext) CallRemImageVersion(imageVersionId string) (map[st
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallGetDockerImageVersions(imageId string) ([]map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetDockerImageVersions(imageId string) ([]map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallGetDockerImageVersions")
+	cmdContext.StartCall("GetDockerImageVersions")
 
 	var resp *http.Response
 	var err error
@@ -1895,10 +1917,10 @@ func (cmdContext *CmdContext) CallGetDockerImageVersions(imageId string) ([]map[
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallUpdateUserInfo(userId, userName,
+func (cmdContext *CmdContext) UpdateUserInfo(userId, userName,
 	email string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallUpdateUserInfo")
+	cmdContext.StartCall("UpdateUserInfo")
 
 	var resp *http.Response
 	var err error
@@ -1918,9 +1940,9 @@ func (cmdContext *CmdContext) CallUpdateUserInfo(userId, userName,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallUserExists(userId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) UserExists(userId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallUserExists")
+	cmdContext.StartCall("UserExists")
 
 	var resp *http.Response
 	var err error
@@ -1942,10 +1964,10 @@ func (cmdContext *CmdContext) CallUserExists(userId string) (map[string]interfac
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallUseScanConfigForImage(dockerImageId,
+func (cmdContext *CmdContext) UseScanConfigForImage(dockerImageId,
 	scanConfigId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallUseScanConfigForImage")
+	cmdContext.StartCall("UseScanConfigForImage")
 	
 	var resp *http.Response
 	var err error
@@ -1966,10 +1988,10 @@ func (cmdContext *CmdContext) CallUseScanConfigForImage(dockerImageId,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallStopUsingScanConfigForImage(dockerImageId,
+func (cmdContext *CmdContext) StopUsingScanConfigForImage(dockerImageId,
 	scanConfigId string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallStopUsingScanConfigForImage")
+	cmdContext.StartCall("StopUsingScanConfigForImage")
 	
 	var resp *http.Response
 	var err error
@@ -1990,9 +2012,9 @@ func (cmdContext *CmdContext) CallStopUsingScanConfigForImage(dockerImageId,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallEnableEmailVerification(enabled bool) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) EnableEmailVerification(enabled bool) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallEnableEmailVerification")
+	cmdContext.StartCall("EnableEmailVerification")
 	
 	var resp *http.Response
 	var err error
@@ -2020,9 +2042,9 @@ func (cmdContext *CmdContext) CallEnableEmailVerification(enabled bool) (map[str
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallValidateAccountVerificationToken(token string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) ValidateAccountVerificationToken(token string) (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallValidateAccountVerificationToken")
+	cmdContext.StartCall("ValidateAccountVerificationToken")
 	
 	var resp *http.Response
 	var err error
@@ -2044,9 +2066,9 @@ func (cmdContext *CmdContext) CallValidateAccountVerificationToken(token string)
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) CallClearAll() (map[string]interface{}, error) {
+func (cmdContext *CmdContext) ClearAll() (map[string]interface{}, error) {
 	
-	cmdContext.StartCall("CallClearAll")
+	cmdContext.StartCall("ClearAll")
 	
 	var resp *http.Response
 	var err error
