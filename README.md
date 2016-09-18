@@ -7,11 +7,11 @@ The syntax is,
 The options are,
 ```
   -help
-  -s The URL protocol scheme: one of "http", "https", or "unix".
+  -s The URL protocol scheme: one of "http", "https", or "unix". The default is "http".
   -h The host IP address or DNS name.
   -p The TCP port.
   -u The user Id (if the requested command requires authentication).
-  -w The password ( " " )
+  -w The password (if a user id is specified).
 ```
 For example,
 ```
