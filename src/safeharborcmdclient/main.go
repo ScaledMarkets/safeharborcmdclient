@@ -17,7 +17,8 @@ import (
 	"os"
 	"flag"
 	"reflect"
-	"encoding/json"
+
+	"utilities/rest"
 )
 
 const (
@@ -57,12 +58,10 @@ func main() {
 	
 	// Obtain the command name and its arguments.
 	var command = args[0]
-	fmt.Println(fmt.Sprintf("args has len %d", len(args)))  // debug
 	var commandArgs []string = make([]string, len(args)-1)
 	for i, ra := range args {
 		if i > 0 {
 			commandArgs[i-1] = ra
-			fmt.Println(fmt.Sprintf("commandArgs[%d]=%s", (i-1), ra))  // debug
 		}
 	}
 	
@@ -135,17 +134,10 @@ func main() {
 			
 			// Determine result type.
 			switch result := results[0].Interface().(type) {
-				case map[string]interface{}, []map[string]interface{}:
-					// Convert the result to JSON and print it.
-					var jb []byte
-					jb, err = json.Marshal(result)
-					if err != nil { // error unmarshalling result
-						fmt.Println("Error unmarshalling result: " + err.Error())
-						os.Exit(2)
-					} else {
-						fmt.Println(string(jb))  // Print the result.
-					}
-					
+				case map[string]interface{}:
+					rest.PrintMap(result)
+				case []map[string]interface{}:
+					rest.PrintMaps(result)
 				case int64: {
 					fmt.Println(fmt.Sprintf("%d bytes downloaded", result))
 				}
