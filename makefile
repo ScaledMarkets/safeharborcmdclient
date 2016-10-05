@@ -1,7 +1,7 @@
 PRODUCTNAME=Safe Harbor Command Line Client
 ORG=Scaled Markets
 PACKAGENAME=safeharborcmdclient
-EXECNAME=$(PACKAGENAME)
+EXECNAME=safeharbor
 
 .DELETE_ON_ERROR:
 .ONESHELL:
@@ -13,7 +13,7 @@ SHELL = /bin/sh
 CURDIR:=$(shell pwd)
 UTILITIESDIR:=$(realpath $(CURDIR)/../Utilities)
 
-.PHONY: all compile clean info
+.PHONY: all compile test clean info
 .DEFAULT: all
 
 src_dir = $(CURDIR)/src
@@ -30,11 +30,17 @@ $(build_dir)/$(EXECNAME): $(build_dir) $(src_dir)/$(PACKAGENAME)/*.go
 # 'make compile' builds the executable, which is placed in <build_dir>.
 compile: $(build_dir) $(src_dir)/$(PACKAGENAME)/*.go
 	@echo "UTILITIESDIR=$(UTILITIESDIR)"
-	@GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME)
+	@GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME) -o $(EXECNAME)
 
 $(pkg_dir)/$(CPU_ARCH)/$(PACKAGENAME)/*.a : compile
 
 $(build_dir)/$(PACKAGENAME): compile
 
+test:
+	java cucumber.api.cli.Main
+
 clean:
-	rm $(build_dir)/*
+	rm -rf $(build_dir)/*
+
+info:
+	@echo "Makefile for $(PRODUCTNAME)."

@@ -1,12 +1,22 @@
 /*******************************************************************************
  * Access a SafeHarbor server from a command line.
  * Syntax:
- *	safeharborcmdclient [-option]* command [arg]*
- * The commands is simply the name of the REST function, with arguments according
- * to that REST function. If a REST function has a file argument, the command line
- * takes a file path for that argument.
- * The options are:
- *	-TBD-
+ *	safeharbor [-option]* command [arg]*
+ * The commands are:
+ *	scan <safeharbor-image-path>
+ *	scan from <image-source>
+ *	rest <rest-command>
+ * where,
+ *	<safeharbor-image-path> is the fully qualified name of an image in a
+ *		SafeHarbor repository, with the version optional. The syntax is,
+ *		<account>/<project>/<image-name>[:<version>]
+ *	<image-source> is one of,
+ *		docker <image-name>
+ *		registry <registry-dns-name>/<image-name>
+ *		file <image-file-path>
+ *	<rest-command> is the name of the REST function, with arguments according
+ *		to that REST function. If a REST function has a file argument, the
+ *		command line takes a file path for that argument.
  */
 
 package main
@@ -33,6 +43,8 @@ func main() {
 	var port *int = flag.Int("p", 80, "Port server is on.")
 	var userId *string = flag.String("u", "", "User Id for accessing the Safe Harbor server")
 	var password *string = flag.String("w", "", "Password for accessing the Safe Harbor server")
+	var userId *string = flag.String("userid", "", "User Id for accessing the Safe Harbor server")
+	var password *string = flag.String("password", "", "Password for accessing the Safe Harbor server")
 	
 	flag.Parse()
 
