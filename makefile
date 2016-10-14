@@ -10,6 +10,11 @@ CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/cucumber-jvm-
 CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/gherkin-2.12.2.jar
 CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/gherkin-jvm-deps-1.0.3.jar
 
+JSON:=$(HOME)/Library/json/*
+
+SAFEHARBOR_HOST=54.71.85.235
+SAFEHARBOR_PORT=
+
 .DELETE_ON_ERROR:
 .ONESHELL:
 .SUFFIXES:
@@ -24,7 +29,7 @@ src_dir = $(CURDIR)/src
 build_dir = $(CURDIR)/bin
 test_dir = $(CURDIR)/test
 
-.PHONY: all compile test clean info
+.PHONY: all compile test_prep test_compile test clean info
 .DEFAULT: all
 
 all: compile
@@ -43,26 +48,26 @@ $(pkg_dir)/$(CPU_ARCH)/$(PACKAGENAME)/*.a : compile
 
 $(build_dir)/$(PACKAGENAME): compile
 
-cver:
-	@echo CUCUMBER_CLASSPATH=$(CUCUMBER_CLASSPATH)
+cukever:
 	java -cp $(CUCUMBER_CLASSPATH) cucumber.api.cli.Main --version
 
-chelp:
+cukehelp:
 	java -cp $(CUCUMBER_CLASSPATH) cucumber.api.cli.Main --help
 
-testa:
-	java -cp $(CUCUMBER_CLASSPATH) cucumber.api.cli.Main $(test_dir)/features
+test_check:
+	java -cp $(CUCUMBER_CLASSPATH):$(JSON) cucumber.api.cli.Main $(test_dir)/features
 
-testb:
-	javac -cp $(CUCUMBER_CLASSPATH) $(test_dir)/steps/test/*.java
+test_compile:
+	javac -cp $(CUCUMBER_CLASSPATH):$(JSON) $(test_dir)/steps/test/*.java
 
-testc:
-	java -cp $(CUCUMBER_CLASSPATH):$(test_dir)/steps cucumber.api.cli.Main \
+test: test_compile
+	java -cp $(CUCUMBER_CLASSPATH):$(JSON):$(test_dir)/steps cucumber.api.cli.Main \
 		--glue test $(test_dir)/features \
 		--tags @done
 
 clean:
 	rm -rf $(build_dir)/*
+	rm -f $(test_dir)/steps/test/*.class
 
 info:
 	@echo "Makefile for $(PRODUCTNAME)."

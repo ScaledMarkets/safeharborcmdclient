@@ -17,6 +17,8 @@
  *	<rest-command> is the name of the REST function, with arguments according
  *		to that REST function. If a REST function has a file argument, the
  *		command line takes a file path for that argument.
+ *
+ * Copyright Scaled Markets, Inc.
  */
 
 package main
