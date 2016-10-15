@@ -2,6 +2,7 @@ PRODUCTNAME=Safe Harbor Command Line Client
 ORG=Scaled Markets
 PACKAGENAME=safeharborcmdclient
 EXECNAME=safeharbor
+CPU_ARCH:=$(shell uname -s | tr '[:upper:]' '[:lower:]')_amd64
 
 HOME:=/Users/cliffordberg
 CUCUMBER_CLASSPATH:=$(HOME)/Library/Cucumber/cucumber-core-1.1.8.jar
@@ -23,7 +24,7 @@ SAFEHARBOR_PORT=
 SHELL = /bin/sh
 
 CURDIR:=$(shell pwd)
-UTILITIESDIR:=$(realpath $(CURDIR)/../Utilities)
+UTILITIESDIR:=$(realpath $(CURDIR)/../utilities)
 
 src_dir = $(CURDIR)/src
 build_dir = $(CURDIR)/bin
@@ -41,14 +42,10 @@ $(build_dir):
 # Main executable depends on source files.
 $(build_dir)/$(EXECNAME): $(build_dir) $(src_dir)/$(PACKAGENAME)/*.go
 
-# Main executable depends on external packages.
-$(build_dir)/$(EXECNAME): $(UTILITIESDIR)/$(CPU_ARCH)/$(PACKAGENAME)/*.a
-
 # The compile target depends on the main executable.
 # 'make compile' builds the executable, which is placed in <build_dir>.
 compile: $(build_dir)/$(EXECNAME)
-	@echo "UTILITIESDIR=$(UTILITIESDIR)"
-	@GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME) -o $(EXECNAME)
+	GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME)
 
 cukever:
 	java -cp $(CUCUMBER_CLASSPATH) cucumber.api.cli.Main --version
