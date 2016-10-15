@@ -28,6 +28,7 @@ UTILITIESDIR:=$(realpath $(CURDIR)/../Utilities)
 src_dir = $(CURDIR)/src
 build_dir = $(CURDIR)/bin
 test_dir = $(CURDIR)/test
+pkg_dir = $(CURDIR)/pkg
 
 .PHONY: all compile test_prep test_compile test clean info
 .DEFAULT: all
@@ -37,16 +38,17 @@ all: compile
 $(build_dir):
 	mkdir $(build_dir)
 
+# Main executable depends on source files.
 $(build_dir)/$(EXECNAME): $(build_dir) $(src_dir)/$(PACKAGENAME)/*.go
 
+# Main executable depends on external packages.
+$(build_dir)/$(EXECNAME): $(UTILITIESDIR)/$(CPU_ARCH)/$(PACKAGENAME)/*.a
+
+# The compile target depends on the main executable.
 # 'make compile' builds the executable, which is placed in <build_dir>.
-compile: $(build_dir) $(src_dir)/$(PACKAGENAME)/*.go
+compile: $(build_dir)/$(EXECNAME)
 	@echo "UTILITIESDIR=$(UTILITIESDIR)"
 	@GOPATH=$(CURDIR):$(UTILITIESDIR) go install $(PACKAGENAME) -o $(EXECNAME)
-
-$(pkg_dir)/$(CPU_ARCH)/$(PACKAGENAME)/*.a : compile
-
-$(build_dir)/$(PACKAGENAME): compile
 
 cukever:
 	java -cp $(CUCUMBER_CLASSPATH) cucumber.api.cli.Main --version
