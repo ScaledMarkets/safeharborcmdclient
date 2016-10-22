@@ -1,3 +1,9 @@
+# Note: The utilities package must be installed parallel to this package. In that
+# package, only the binary (.a file) is needed.
+
+SAFEHARBOR_HOST=54.71.85.235
+SAFEHARBOR_PORT=6000
+
 PRODUCTNAME=Safe Harbor Command Line Client
 ORG=Scaled Markets
 PACKAGENAME=safeharborcmdclient
@@ -12,9 +18,6 @@ CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/gherkin-2.12.
 CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/gherkin-jvm-deps-1.0.3.jar
 
 JSON:=$(HOME)/Library/json/*
-
-SAFEHARBOR_HOST=54.71.85.235
-SAFEHARBOR_PORT=
 
 .DELETE_ON_ERROR:
 .ONESHELL:
@@ -60,7 +63,9 @@ test_compile:
 	javac -cp $(CUCUMBER_CLASSPATH):$(JSON) $(test_dir)/steps/test/*.java
 
 test: test_compile
-	java -cp $(CUCUMBER_CLASSPATH):$(JSON):$(test_dir)/steps cucumber.api.cli.Main \
+	java -cp $(CUCUMBER_CLASSPATH):$(JSON):$(test_dir)/steps \
+		-DSAFEHARBOR_HOST=$(SAFEHARBOR_HOST) -DSAFEHARBOR_PORT=$(SAFEHARBOR_PORT) \
+		cucumber.api.cli.Main \
 		--glue test $(test_dir)/features \
 		--tags @done
 

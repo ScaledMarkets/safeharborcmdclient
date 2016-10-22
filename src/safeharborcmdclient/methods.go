@@ -13,7 +13,7 @@ import (
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) Ping(groupId string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) Ping() (map[string]interface{}, error) {
 	
 	cmdContext.StartCall("Ping")
 	var resp *http.Response

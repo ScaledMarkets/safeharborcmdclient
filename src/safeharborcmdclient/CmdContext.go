@@ -74,6 +74,7 @@ func (cmdContext *CmdContext) AssertErrIsNil(err error, msg string) bool {
  */
 func (cmdContext *CmdContext) StartCall(methodName string) {
 	cmdContext.CurrentMethodName = methodName
+	fmt.Println("Calling " + methodName + "...")
 }
 
 /*******************************************************************************

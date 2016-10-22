@@ -45,8 +45,6 @@ func main() {
 	var port *int = flag.Int("p", 80, "Port server is on.")
 	var userId *string = flag.String("u", "", "User Id for accessing the Safe Harbor server")
 	var password *string = flag.String("w", "", "Password for accessing the Safe Harbor server")
-	var userId *string = flag.String("userid", "", "User Id for accessing the Safe Harbor server")
-	var password *string = flag.String("password", "", "Password for accessing the Safe Harbor server")
 	
 	flag.Parse()
 
@@ -90,13 +88,6 @@ func main() {
 		os.Exit(2)
 	}
 	
-	// Prepare the method parameter values for the method call. These are the
-	// command line arguments.
-	var inVals = make([]reflect.Value, len(commandArgs))
-	for i, arg := range commandArgs {
-		inVals[i] = reflect.ValueOf(arg)
-	}
-	
 	// Authenticate to server - this returns a SessionId.
 	var restResponse map[string]interface{}
 	var err error
@@ -123,18 +114,29 @@ func main() {
 	}
 	
 	// Identify the method to be called.
+	fmt.Println("Command: " + command)
 	var meth reflect.Value = cmdContextValue.MethodByName(command)
 	if (! meth.IsValid()) || meth.IsNil() {
 		fmt.Println("Method '" + command + "' not found")
 		os.Exit(2)
 	}
 
+	// Prepare the method parameter values for the method call. These are the
+	// command line arguments.
+	var inVals = make([]reflect.Value, len(commandArgs))
+	//inVals[0] = reflect.ValueOf(cmdContext)
+	for i, arg := range commandArgs {
+		inVals[i] = reflect.ValueOf(arg)
+	}
+	
 	// Perform the method call.
 	// All methods return a pair of objects of one of these sets of object types:
 	//	map[string]interface{}, error
 	//	[]map[string]interface{}, error
 	//	int64, error - when a file is downloaded
+	fmt.Println("Performing call...")
 	var results []reflect.Value = meth.Call(inVals)
+	fmt.Println("...call completed.")
 	if len(results) != 2 {
 		fmt.Println(fmt.Sprintf(
 			"%d return value(s) when calling %s: expected two", len(results), command))
