@@ -9,22 +9,20 @@ import cucumber.api.java.en.When;
 
 import org.json.*;
 
+import static test.Utils.*;
+
 public class TestHelp extends TestBase {
-	
-	@Before
-	public void before(Scenario scenario) {
-		setScenario(scenario);
-	}
 	
 	@When("^I request help$")
 	public void i_request_help() throws Throwable {
-		getScenario().write("Executing...");
 		process = Runtime.getRuntime().exec(
 			"bin/safeharborcmdclient -help");
 	}
 	
 	@Then("^help is printed$")
 	public void help_is_printed() throws Throwable {
-		String response = Utils.getResponse(process);
+		String str = Utils.getResponse(process);
+		System.out.println("Obtained response: " + str);
+		System.out.println();
 	}
 }

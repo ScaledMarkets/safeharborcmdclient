@@ -204,6 +204,7 @@ func usage(v reflect.Value) {
 	fmt.Fprintf(os.Stderr, "Usage: %s [options] [arg]...\n", os.Args[0])
 	flag.PrintDefaults()
 	
+	/*
 	fmt.Println("\tCommands:")
 	for m := 1; m <= v.NumMethod(); m++ {
 		var meth reflect.Value = v.Method(m-1)
@@ -216,7 +217,7 @@ func usage(v reflect.Value) {
 		}
 		fmt.Println()
 	}
-	
+	*/
 }
 
 /*******************************************************************************
