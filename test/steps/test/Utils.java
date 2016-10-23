@@ -32,20 +32,15 @@ public class Utils {
 		assert process != null;
 		assert process.exitValue() == 0;
 		
-		System.out.println("Waiting for process...");
 		//boolean ok = process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
 		//assert ok;
 		//if (! ok) { throw new Exception("timed out"); }
-		System.out.println("...done.");
 		InputStream os = process.getInputStream();
 		assert os != null;
 		BufferedReader lineReader = new BufferedReader(new InputStreamReader(os));
 		Stream<String> stream = lineReader.lines();
 		String[] responseAr = { "" };
-		System.out.println("Reading response...");
 		stream.forEachOrdered(line -> responseAr[0] += line);
-		System.out.println("...done. Constructing JSON object...");
-		System.out.println("Output: " + responseAr[0]);
 		return responseAr[0];
 	}
 	
@@ -54,5 +49,14 @@ public class Utils {
 		JSONObject json = new JSONObject(response);
 		System.out.println("...done.");
 		return json;
+	}
+	
+	public static void assertThat(boolean expr) throws Exception {
+		assertThat(expr, null);
+	}
+	
+	public static void assertThat(boolean expr, String msg) throws Exception {
+		if (msg != null) msg = "; " + msg;
+		if (! expr) throw new Exception("Assertion violation" + msg);
 	}
 }

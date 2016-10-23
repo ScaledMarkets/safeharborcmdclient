@@ -52,7 +52,6 @@ func main() {
 	var cmdContext *CmdContext
 	cmdContext = CreateCmdContext(*scheme, *hostname, *port,
 		*userId, *password, SetSessionId)
-	cmdContext.Print()
 	var cmdContextValue = reflect.ValueOf(cmdContext)
 	
 	// Check arguments.
@@ -114,7 +113,6 @@ func main() {
 	}
 	
 	// Identify the method to be called.
-	fmt.Println("Command: " + command)
 	var meth reflect.Value = cmdContextValue.MethodByName(command)
 	if (! meth.IsValid()) || meth.IsNil() {
 		fmt.Println("Method '" + command + "' not found")
@@ -134,9 +132,7 @@ func main() {
 	//	map[string]interface{}, error
 	//	[]map[string]interface{}, error
 	//	int64, error - when a file is downloaded
-	fmt.Println("Performing call...")
 	var results []reflect.Value = meth.Call(inVals)
-	fmt.Println("...call completed.")
 	if len(results) != 2 {
 		fmt.Println(fmt.Sprintf(
 			"%d return value(s) when calling %s: expected two", len(results), command))
