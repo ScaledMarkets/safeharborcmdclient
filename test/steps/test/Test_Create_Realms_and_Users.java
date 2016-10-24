@@ -13,8 +13,7 @@ public class Test_Create_Realms_and_Users extends TestBase {
 	
 	String realm4AdminUserId = "realm4admin";
 	String realm4AdminPswd = "RealmPswd";
-	String joeUserId = "jdoe";
-	String joePswd = "weakpswd";
+	String realm4AdminUserName = "realm 4 Admin Full Name";
 	
 	String realm4Id;
 	String user4AdminRealms;
@@ -27,7 +26,7 @@ public class Test_Create_Realms_and_Users extends TestBase {
 	@When("^I send a Ping request$")
 	public void () throws Throwable {
 		process = makeRequest(CreateRealmAnon, "realm4", "realm 4 Org",
-			realm4AdminUserId, "realm 4 Admin Full Name", "realm4admin@gmail.com",
+			realm4AdminUserId, realm4AdminUserName, "realm4admin@gmail.com",
 			realm4AdminPswd);
 	}
 
@@ -44,7 +43,7 @@ public class Test_Create_Realms_and_Users extends TestBase {
 
 		Object obj = jSONObject.get("Id");
 		assertThat(obj instanceof String);
-		String realmId = (String)obj;
+		String userObjId = (String)obj;
 		
 		obj = jSONObject.get("UserId");
 		assertThat(obj instanceof String);
@@ -58,9 +57,7 @@ public class Test_Create_Realms_and_Users extends TestBase {
 		assertThat(obj instanceof String);
 		String realmId = (String)obj;
 		
-		
-		
-		
-		assertThat(....);
+		assertThat(userId.equals(realm4admin));
+		assertThat(userName.equals(realm4AdminUserName));
 	}
 }
