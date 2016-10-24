@@ -13,8 +13,7 @@ public class TestPing extends TestBase {
 	
 	@When("^I send a Ping request$")
 	public void i_send_a_Ping_request() throws Throwable {
-		process = Runtime.getRuntime().exec(
-			"bin/safeharborcmdclient -h " + getSafeHarborHost() + " -p " + getSafeHarborPort() + " Ping");
+		process = makeRequest("Ping");
 	}
 	
 	@Then("^the HTTP response code should be (\\d+)$")
