@@ -36,15 +36,31 @@ public class Test_Create_Realms_and_Users extends TestBase {
 		
 		JSONObject jSONObject = getResponseAsJSON(process);
 		
-		Object obj = jSONObject.get("realm4Id");
+		// Returns UserDesc, which contains:
+		// Id string
+		// UserId string
+		// UserName string
+		// RealmId string
+
+		Object obj = jSONObject.get("Id");
 		assertThat(obj instanceof String);
-		String realm4Id = (String)obj;
+		String realmId = (String)obj;
 		
-		obj = jSONObject.get("user4AdminRealms");
-		assertThat(obj instanceof String[]);
-		String[] user4AdminRealms = (String[])obj;
+		obj = jSONObject.get("UserId");
+		assertThat(obj instanceof String);
+		String userId = (String)obj;
 		
-		assertThat(user4AdminRealms.length() == 1,
-			"Wrong number of admin realms: " + user4AdminRealms.length());
+		obj = jSONObject.get("UserName");
+		assertThat(obj instanceof String);
+		String userName = (String)obj;
+		
+		obj = jSONObject.get("RealmId");
+		assertThat(obj instanceof String);
+		String realmId = (String)obj;
+		
+		
+		
+		
+		assertThat(....);
 	}
 }
