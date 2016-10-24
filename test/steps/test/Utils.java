@@ -28,6 +28,19 @@ public class Utils {
 		return port;
 	}
 	
+	public static Process makeRequest(String methodName, String... args)
+	{
+		String command =
+			"bin/safeharborcmdclient -h " + getSafeHarborHost() +
+			" -p " + getSafeHarborPort() + " " + methodName);
+		
+		for (arg : args) {
+			command += (", " + arg);
+		}
+		
+		return Runtime.getRuntime().exec(command);
+	}
+	
 	public static String getResponse(Process process) throws Exception {
 		assert process != null;
 		assert process.exitValue() == 0;
