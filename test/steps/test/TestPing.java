@@ -11,25 +11,28 @@ import static test.Utils.*;
 
 public class TestPing extends TestBase {
 	
+	String[] responses;  // stdout, stderr
+	
 	@When("^I send a Ping request$")
 	public void i_send_a_Ping_request() throws Throwable {
 		process = makeRequest("Ping");
+		process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS);
+		responses = Utils.getResponse(process);
+		if (process.exitValue() != 0) {
+			throw new Exception(responses[0] + "; " + responses[1]);
+		}
 	}
 	
-	@Then("^the HTTP response code should be (\\d+)$")
-	public void the_HTTP_response_code_should_be(int expected) throws Throwable {
-		
-		String str = Utils.getResponse(process);
-		System.out.println("Obtained response: " + str);
-		System.out.println();
+	@Then("^the ping HTTP response code should be (\\d+)$")
+	public void the_ping_HTTP_response_code_should_be(int expected) throws Throwable {
 		
 		try {
-			JSONObject json = new JSONObject(str);
+			JSONObject json = new JSONObject(responses[0]);
 			Object obj = json.get("HTTPStatusCode");
 			assertThat(obj instanceof Integer);
 			assertThat(((Integer)obj).intValue() == expected);
 		} catch (Exception ex) {
-			throw new Exception(ex.getMessage() + "; response=" + str);
+			throw new Exception("stdout=" + responses[0] + ", stderr=" + responses[1], ex);
 		}
 	}
 }

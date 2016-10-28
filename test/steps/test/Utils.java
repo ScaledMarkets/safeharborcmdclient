@@ -28,38 +28,54 @@ public class Utils {
 		return port;
 	}
 	
-	public static Process makeRequest(String methodName, String... args)
+	public static Process makeRequest(String methodName, String... args) throws Exception
 	{
-		String command =
-			"bin/safeharborcmdclient -h " + getSafeHarborHost() +
-			" -p " + getSafeHarborPort() + " " + methodName);
+		String[] commandAr = new String[args.length + 4];
+		commandAr[0] = "bin/safeharborcmdclient";
+		commandAr[1] = "-h=" + getSafeHarborHost();
+		commandAr[2] = "-p=" + String.valueOf(getSafeHarborPort());
+		commandAr[3] = methodName;
 		
-		for (arg : args) {
-			command += (", " + arg);
+		int i = 4;
+		for (String arg : args) {
+			commandAr[i++] = arg;
 		}
 		
-		return Runtime.getRuntime().exec(command);
+		System.out.println("Executing command: " + commandAr[0]);
+		
+		Process process = Runtime.getRuntime().exec(commandAr);
+		System.out.println("Completed command");
+		return process;
 	}
 	
-	public static String getResponse(Process process) throws Exception {
-		assert process != null;
-		assert process.exitValue() == 0;
+	public static String[] getResponse(Process process) throws Exception {
+		assertThat(process != null);
 		
 		//boolean ok = process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
 		//assert ok;
 		//if (! ok) { throw new Exception("timed out"); }
 		InputStream os = process.getInputStream();
-		assert os != null;
+		assertThat(os != null);
 		BufferedReader lineReader = new BufferedReader(new InputStreamReader(os));
-		Stream<String> stream = lineReader.lines();
-		String[] responseAr = { "" };
-		stream.forEachOrdered(line -> responseAr[0] += line);
-		return responseAr[0];
+		Stream<String> lines = lineReader.lines();
+		String[] responseAr1 = { "" };
+		lines.forEachOrdered(line -> responseAr1[0] += line);
+		String stdout = responseAr1[0];
+		
+		InputStream es = process.getErrorStream();
+		assertThat(es != null);
+		lineReader = new BufferedReader(new InputStreamReader(es));
+		lines = lineReader.lines();
+		String[] responseAr2 = new String[]{ "" };
+		lines.forEachOrdered(line -> responseAr2[0] += line);
+		String stderr = responseAr2[0];
+		
+		return new String[] { stdout, stderr };
 	}
 	
 	public static JSONObject getResponseAsJSON(Process process) throws Exception {
-		String response = getResponse(process);
-		JSONObject json = new JSONObject(response);
+		String[] responses = getResponse(process);
+		JSONObject json = new JSONObject(responses[0]);
 		System.out.println("...done.");
 		return json;
 	}

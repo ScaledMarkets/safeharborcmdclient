@@ -5,4 +5,4 @@ Feature: Ping
 	@done
 	Scenario: Ping
 		When I send a Ping request
-		Then the HTTP response code should be 200
+		Then the ping HTTP response code should be 200

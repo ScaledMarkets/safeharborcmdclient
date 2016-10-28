@@ -127,12 +127,22 @@ func main() {
 		inVals[i] = reflect.ValueOf(arg)
 	}
 	
+	// Verify that the right number of arguments have been supplied.
+	var methodType = meth.Type()
+	var numArgs = methodType.NumIn()
+	if len(inVals) != numArgs {
+		fmt.Println(fmt.Sprintf("Method %s requires %d arguments: %d were supplied",
+			command, numArgs, len(inVals)))
+		os.Exit(2)
+	}
+	
 	// Perform the method call.
 	// All methods return a pair of objects of one of these sets of object types:
 	//	map[string]interface{}, error
 	//	[]map[string]interface{}, error
 	//	int64, error - when a file is downloaded
-	var results []reflect.Value = meth.Call(inVals)
+	var results []reflect.Value
+	results = meth.Call(inVals)
 	if len(results) != 2 {
 		fmt.Println(fmt.Sprintf(
 			"%d return value(s) when calling %s: expected two", len(results), command))

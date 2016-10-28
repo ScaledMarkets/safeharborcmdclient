@@ -21,8 +21,8 @@ public class TestHelp extends TestBase {
 	
 	@Then("^help is printed$")
 	public void help_is_printed() throws Throwable {
-		String str = Utils.getResponse(process);
-		System.out.println("Obtained response: " + str);
+		String[] str = Utils.getResponse(process);
+		System.out.println("Obtained response: " + str[0]);
 		System.out.println();
 	}
 }
