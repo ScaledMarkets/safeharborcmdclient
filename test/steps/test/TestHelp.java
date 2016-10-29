@@ -14,13 +14,13 @@ import static test.Utils.*;
 public class TestHelp extends TestBase {
 	
 	@When("^I request help$")
-	public void i_request_help() throws Throwable {
+	public void i_request_help() throws Exception {
 		process = Runtime.getRuntime().exec(
 			"bin/safeharborcmdclient -help");
 	}
 	
 	@Then("^help is printed$")
-	public void help_is_printed() throws Throwable {
+	public void help_is_printed() throws Exception {
 		String[] str = Utils.getResponse(process);
 		System.out.println("Obtained response: " + str[0]);
 		System.out.println();

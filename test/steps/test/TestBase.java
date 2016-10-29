@@ -5,6 +5,8 @@ import cucumber.api.Scenario;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.java.Before;
+import cucumber.api.java.After;
 
 import org.json.*;
 
@@ -24,6 +26,15 @@ public class TestBase {
 			t.printStackTrace();
 			throw t;
 		}
+	}
+	
+	@Before
+	public void beforeEachScenario() throws Exception {
+		responses = makeRequest("ClearAll");
+	}
+	
+	@After
+	public void afterEachScenario() throws Exception {
 	}
 	
 	public void setScenario(Scenario s) { this.scenario = s; }

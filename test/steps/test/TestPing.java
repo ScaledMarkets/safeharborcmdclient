@@ -14,12 +14,12 @@ public class TestPing extends TestBase {
 	String[] responses;  // stdout, stderr
 	
 	@When("^I send a Ping request$")
-	public void i_send_a_Ping_request() throws Throwable {
+	public void i_send_a_Ping_request() throws Exception {
 		responses = makeRequest("Ping");
 	}
 	
 	@Then("^the ping HTTP response code should be (\\d+)$")
-	public void the_ping_HTTP_response_code_should_be(int expected) throws Throwable {
+	public void the_ping_HTTP_response_code_should_be(int expected) throws Exception {
 		
 		try {
 			JSONObject json = new JSONObject(responses[0]);
