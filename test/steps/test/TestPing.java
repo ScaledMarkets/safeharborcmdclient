@@ -16,11 +16,6 @@ public class TestPing extends TestBase {
 	@When("^I send a Ping request$")
 	public void i_send_a_Ping_request() throws Throwable {
 		process = makeRequest("Ping");
-		process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS);
-		responses = Utils.getResponse(process);
-		if (process.exitValue() != 0) {
-			throw new Exception(responses[0] + "; " + responses[1]);
-		}
 	}
 	
 	@Then("^the ping HTTP response code should be (\\d+)$")

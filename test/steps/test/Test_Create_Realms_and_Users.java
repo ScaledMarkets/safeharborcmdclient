@@ -1,9 +1,12 @@
 package test;
 
 import cucumber.api.Format;
+import cucumber.annotation.Before;
+import cucumber.annotation.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.java.en.And;
 
 import org.json.*;
 
@@ -19,6 +22,15 @@ public class Test_Create_Realms_and_Users extends TestBase {
 	String user4AdminRealms;
 	String[] responses;
 
+	@Before
+	public void beforeEachScenario() {
+		process = makeRequest("ClearAll");
+	}
+	
+	@After
+	public void afterEachScenario() {
+	}
+	
 	@Given("^that I am not logged into SafeHarbor$")
 	public void that_I_am_not_logged_into_SafeHarbor() throws Throwable {
 		
@@ -29,11 +41,6 @@ public class Test_Create_Realms_and_Users extends TestBase {
 		process = makeRequest("CreateRealmAnon", "realm4", "realm 4 Org",
 			realm4AdminUserId, realm4AdminUserName, "realm4admin@gmail.com",
 			realm4AdminPswd);
-		process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS);
-		responses = Utils.getResponse(process);
-		if (process.exitValue() != 0) {
-			throw new Exception(responses[0] + "; " + responses[1]);
-		}
 	}
 
 	@Then("^the CreateRealmAnon HTTP response code should be (\\d+)$")
@@ -60,7 +67,7 @@ public class Test_Create_Realms_and_Users extends TestBase {
 		assertThat(obj instanceof String, responses[0]);
 		String userId = (String)obj;
 		
-		obj = jSONObject.get("UserName");
+		obj = jSONObject.get("Name");
 		assertThat(obj instanceof String, responses[0]);
 		String userName = (String)obj;
 		
@@ -70,5 +77,29 @@ public class Test_Create_Realms_and_Users extends TestBase {
 		
 		assertThat(userId.equals(realm4AdminUserId));
 		assertThat(userName.equals(realm4AdminUserName));
+	}
+	
+	// Verify that we can log in as the admin user that we just created.
+	@And("^we can log in as the admin user that we just created\\.$")
+	public void we_can_log_in_as_the_admin_user_that_we_just_created() throws Throwable {
+		
+		process = makeRequest("Authenticate", realm4AdminUserId, realm4AdminPswd);
+		
+		JSONObject jSONObject;
+		try {
+			jSONObject = new JSONObject(responses[0]);
+		} catch (Exception ex) {
+			throw new Exception("stdout=" + responses[0] + ", stderr=" + responses[1], ex);
+		}
+		
+		Object obj = jSONObject.get("AuthenticatedUserid");
+		assertThat(obj instanceof String, responses[0]);
+		String retUserId = (String)obj;
+		assertThat(retUserId.equals(realm4AdminUserId), responses[0]);
+
+		obj = jSONObject.get("IsAdmin");
+		assertThat(obj instanceof Boolean, responses[0]);
+		boolean retIsAdmin = (Boolean)obj;
+		assertThat(retIsAdmin, responses[0]);
 	}
 }

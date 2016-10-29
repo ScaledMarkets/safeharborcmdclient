@@ -41,10 +41,12 @@ public class Utils {
 			commandAr[i++] = arg;
 		}
 		
-		System.out.println("Executing command: " + commandAr[0]);
-		
 		Process process = Runtime.getRuntime().exec(commandAr);
-		System.out.println("Completed command");
+		process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS);
+		responses = Utils.getResponse(process);
+		if (process.exitValue() != 0) {
+			throw new Exception(responses[0] + "; " + responses[1]);
+		}
 		return process;
 	}
 	
