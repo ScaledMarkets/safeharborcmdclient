@@ -28,7 +28,7 @@ public class Utils {
 		return port;
 	}
 	
-	public static Process makeRequest(String methodName, String... args) throws Exception
+	public static String[] makeRequest(String methodName, String... args) throws Exception
 	{
 		String[] commandAr = new String[args.length + 4];
 		commandAr[0] = "bin/safeharborcmdclient";
@@ -43,11 +43,11 @@ public class Utils {
 		
 		Process process = Runtime.getRuntime().exec(commandAr);
 		process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS);
-		responses = Utils.getResponse(process);
+		String[] responses = Utils.getResponse(process);
 		if (process.exitValue() != 0) {
 			throw new Exception(responses[0] + "; " + responses[1]);
 		}
-		return process;
+		return responses;
 	}
 	
 	public static String[] getResponse(Process process) throws Exception {

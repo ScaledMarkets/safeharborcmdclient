@@ -1,8 +1,8 @@
 package test;
 
 import cucumber.api.Format;
-import cucumber.annotation.Before;
-import cucumber.annotation.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -12,7 +12,7 @@ import org.json.*;
 
 import static test.Utils.*;
 
-public class Test_Create_Realms_and_Users extends TestBase {
+public class Test_create_a_realm_without_being_logged_in extends TestBase {
 	
 	String realm4AdminUserId = "realm4admin";
 	String realm4AdminPswd = "RealmPswd";
@@ -23,12 +23,12 @@ public class Test_Create_Realms_and_Users extends TestBase {
 	String[] responses;
 
 	@Before
-	public void beforeEachScenario() {
-		process = makeRequest("ClearAll");
+	public void beforeEachScenario() throws Throwable {
+		responses = makeRequest("ClearAll");
 	}
 	
 	@After
-	public void afterEachScenario() {
+	public void afterEachScenario() throws Throwable {
 	}
 	
 	@Given("^that I am not logged into SafeHarbor$")
@@ -38,7 +38,7 @@ public class Test_Create_Realms_and_Users extends TestBase {
 	
 	@When("^I call CreateRealmAnon$")
 	public void i_call_CreateRealmAnon() throws Throwable {
-		process = makeRequest("CreateRealmAnon", "realm4", "realm 4 Org",
+		responses = makeRequest("CreateRealmAnon", "realm4", "realm 4 Org",
 			realm4AdminUserId, realm4AdminUserName, "realm4admin@gmail.com",
 			realm4AdminPswd);
 	}
@@ -83,7 +83,7 @@ public class Test_Create_Realms_and_Users extends TestBase {
 	@And("^we can log in as the admin user that we just created\\.$")
 	public void we_can_log_in_as_the_admin_user_that_we_just_created() throws Throwable {
 		
-		process = makeRequest("Authenticate", realm4AdminUserId, realm4AdminPswd);
+		responses = makeRequest("Authenticate", realm4AdminUserId, realm4AdminPswd);
 		
 		JSONObject jSONObject;
 		try {

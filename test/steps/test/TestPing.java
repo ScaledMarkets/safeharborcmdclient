@@ -15,7 +15,7 @@ public class TestPing extends TestBase {
 	
 	@When("^I send a Ping request$")
 	public void i_send_a_Ping_request() throws Throwable {
-		process = makeRequest("Ping");
+		responses = makeRequest("Ping");
 	}
 	
 	@Then("^the ping HTTP response code should be (\\d+)$")
