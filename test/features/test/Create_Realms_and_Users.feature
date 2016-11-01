@@ -10,10 +10,10 @@ Feature: Create Realms and Users
 		And we can log in as the admin user that we just created.
 
 	Scenario: Verify that one can retrieve the users of a realm.
-		Given that admin user id realm4admin of realm4 is authenticated,
-		And there are two non-admin users in the realm.
+		Given that there are 2 non-admin users in a realm,
+		And an admin user is authenticated,
 		When I retrieve the users of the realm,
 		Then 3 users are returned
-		And only one of those users is an admin user.
+		And only 1 of those users is an admin user.
 	
 	

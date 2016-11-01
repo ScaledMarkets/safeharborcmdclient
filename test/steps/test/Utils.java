@@ -75,6 +75,16 @@ public class Utils {
 		return new String[] { stdout, stderr };
 	}
 	
+	public static JSONObject parseResponses(String[] responses) throws Exception {
+		JSONObject jSONObject;
+		try {
+			jSONObject = new JSONObject(responses[0]);
+		} catch (Exception ex) {
+			throw new Exception("stdout=" + responses[0] + ", stderr=" + responses[1], ex);
+		}
+		return jSONObject;
+	}
+	
 	public static JSONObject getResponseAsJSON(Process process) throws Exception {
 		String[] responses = getResponse(process);
 		JSONObject json = new JSONObject(responses[0]);

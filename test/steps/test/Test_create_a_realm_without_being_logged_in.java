@@ -9,6 +9,7 @@ import cucumber.api.java.en.And;
 import org.json.*;
 
 import static test.Utils.*;
+import static test.Methods.*;
 
 public class Test_create_a_realm_without_being_logged_in extends TestBase {
 	
@@ -16,12 +17,19 @@ public class Test_create_a_realm_without_being_logged_in extends TestBase {
 	String realm4AdminPswd = "RealmPswd";
 	String realm4AdminUserName = "realm 4 Admin Full Name";
 	
+	String[] responses;
 	String realm4Id;
 	String user4AdminRealms;
-	String[] responses;
 
 	@Given("^that I am not logged into SafeHarbor$")
 	public void that_I_am_not_logged_into_SafeHarbor() throws Exception {
+		responses = makeRequest("GetMyDesc");
+		
+		JSONObject jSONObject = parseResponses(responses);
+		Object obj = jSONObject.get("HTTPStatusCode");
+		assertThat(obj instanceof Integer, responses[0]);
+		int statusCode = ((Integer)obj).intValue();
+		assertThat(statusCode != 200);
 		
 	}
 	
@@ -41,12 +49,7 @@ public class Test_create_a_realm_without_being_logged_in extends TestBase {
 		// UserName string
 		// RealmId string
 
-		JSONObject jSONObject;
-		try {
-			jSONObject = new JSONObject(responses[0]);
-		} catch (Exception ex) {
-			throw new Exception("stdout=" + responses[0] + ", stderr=" + responses[1], ex);
-		}
+		JSONObject jSONObject = parseResponses(responses);
 		
 		Object obj = jSONObject.get("Id");
 		assertThat(obj instanceof String, responses[0]);
@@ -74,12 +77,7 @@ public class Test_create_a_realm_without_being_logged_in extends TestBase {
 		
 		responses = makeRequest("Authenticate", realm4AdminUserId, realm4AdminPswd);
 		
-		JSONObject jSONObject;
-		try {
-			jSONObject = new JSONObject(responses[0]);
-		} catch (Exception ex) {
-			throw new Exception("stdout=" + responses[0] + ", stderr=" + responses[1], ex);
-		}
+		JSONObject jSONObject = parseResponses(responses);
 		
 		Object obj = jSONObject.get("AuthenticatedUserid");
 		assertThat(obj instanceof String, responses[0]);
