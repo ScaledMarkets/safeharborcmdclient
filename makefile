@@ -15,7 +15,7 @@ CUCUMBER_CLASSPATH:=$(HOME)/Library/Cucumber/cucumber-core-1.1.8.jar
 CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/cucumber-java-1.1.8.jar
 CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/cucumber-jvm-deps-1.0.3.jar
 CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/gherkin-2.12.2.jar
-CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/gherkin-jvm-deps-1.0.3.jar
+#CUCUMBER_CLASSPATH:=$(CUCUMBER_CLASSPATH):$(HOME)/Library/Cucumber/gherkin-jvm-deps-1.0.3.jar
 
 JSON:=$(HOME)/Library/json/*
 

@@ -30,7 +30,7 @@ public class TestBase {
 	
 	@Before
 	public void beforeEachScenario() throws Exception {
-		responses = makeRequest("ClearAll");
+		//makeRequest("ClearAll");
 	}
 	
 	@After

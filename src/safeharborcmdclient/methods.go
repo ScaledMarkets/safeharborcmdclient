@@ -189,7 +189,7 @@ func (cmdContext *CmdContext) CreateRealm(realmName, orgFullName,
 /*******************************************************************************
  * 
  */
-func (cmdContext *CmdContext) TestGetRealmByName(realmName string) (map[string]interface{}, error) {
+func (cmdContext *CmdContext) GetRealmByName(realmName string) (map[string]interface{}, error) {
 	
 	cmdContext.StartCall("TestGetRealmByName")
 	var resp *http.Response

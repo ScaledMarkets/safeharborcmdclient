@@ -27,7 +27,8 @@ func CreateCmdContext(scheme, hostname string, port int, userId string, password
 			hostname, 
 			port, 
 			userId, 
-			password, 
+			password,
+			nil,
 			sessionIdSetter),
 		SessionId: "",
 	}

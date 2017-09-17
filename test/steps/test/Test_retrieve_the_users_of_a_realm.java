@@ -31,7 +31,7 @@ public class Test_retrieve_the_users_of_a_realm extends TestBase {
 	@Given("^that there are 2 non-admin users in a realm,$")
 	public void there_are_2_non_admin_users_in_a_realm() throws Exception {
 		
-		response = makeRequest("CreateRealmAnon", "realm4", "realm 4 Org",
+		responses = makeRequest("CreateRealmAnon", "realm4", "realm 4 Org",
 			realm4AdminUserId, realm4AdminUserName, "realm4admin@gmail.com",
 			realm4AdminPswd);
 			// Returns a UserDesc
@@ -55,9 +55,9 @@ public class Test_retrieve_the_users_of_a_realm extends TestBase {
 		int statusCode = ((Integer)obj).intValue();
 		assertThat(statusCode != 200);
 		
-		Object obj = jSONObject.get("CanModifyTheseRealms");
+		obj = jSONObject.get("CanModifyTheseRealms");
 		assertThat(obj instanceof String[], responses[0]);
-		String[] canModifyRealms = (String)obj;
+		String[] canModifyRealms = (String[])obj;
 		boolean foundRealm = false;
 		for (String rid : canModifyRealms) {
 			if (rid.equals(realmId)) break;
@@ -67,7 +67,7 @@ public class Test_retrieve_the_users_of_a_realm extends TestBase {
 	
 	@When("^I retrieve the users of the realm,$")
 	public void i_retrieve_the_users_of_the_realm() throws Exception {
-		responses = makeRequest(....);
+		//responses = makeRequest(....);
 	}
 
 	@Then("^(\\d+) users are returned$")
@@ -76,7 +76,7 @@ public class Test_retrieve_the_users_of_a_realm extends TestBase {
 	}
 	
 	@And("^only (\\d+) of those users is an admin user\\.$")
-	public void (int numAdminUsers) throws Exception {
+	public void abc(int numAdminUsers) throws Exception {
 		
 	}
 }
