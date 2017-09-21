@@ -30,7 +30,7 @@ import (
 	"flag"
 	"reflect"
 
-	"utilities/rest"
+	"rest"
 )
 
 const (
